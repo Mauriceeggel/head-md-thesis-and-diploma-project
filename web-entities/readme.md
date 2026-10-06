@@ -5,8 +5,8 @@
 
 <br>
 
-## ⛮ ᴡᴇʙ ᴇɴᴛɪᴛʏ #𝟢𝟤 - 𖢳 ꜱᴛʀᴇᴛᴄʜᴇᴅ ᴘɪxᴇʟ ⛮ - [ ꜰɪʀꜱᴛ ᴄᴏɴᴛᴀᴄᴛ: 𝟤𝟨.𝟢𝟦.𝟣𝟩 ]<br>
-  <audio controls src="audio/web-entity-02.mp3"></audio><br>
+## ⛮ ᴡᴇʙ ᴇɴᴛɪᴛʏ #𝟢𝟤 - 𖢳 ꜱᴛʀᴇᴛᴄʜᴇᴅ ᴘɪxᴇʟ ⛮ - [ ꜰɪʀꜱᴛ ᴄᴏɴᴛᴀᴄᴛ: 𝟤𝟨.𝟢𝟦.𝟣𝟩 ]
+  <audio controls src="audio/web-entity-02.mp3"></audio>
   <audio controls src="audio/web-entity-02-damaged.mp3"></audio>
 
  ![web-entity-02](img/web-entity-02.jpeg)
@@ -15,7 +15,7 @@
 
 <br>
 
-## ⛮ ᴡᴇʙ ᴇɴᴛɪᴛʏ #𝟢𝟣 - 𖡺 ᴇᴄʜᴏᴇꜱ ᴏᴛʜᴇʀ ⛮ - [ ꜰɪʀꜱᴛ ᴄᴏɴᴛᴀᴄᴛ: 𝟤𝟨.𝟣𝟢.𝟢𝟨 ]<br>
+## ⛮ ᴡᴇʙ ᴇɴᴛɪᴛʏ #𝟢𝟣 - 𖡺 ᴇᴄʜᴏᴇꜱ ᴏᴛʜᴇʀ ⛮ - [ ꜰɪʀꜱᴛ ᴄᴏɴᴛᴀᴄᴛ: 𝟤𝟨.𝟣𝟢.𝟢𝟨 ]
   <audio controls src="audio/web-entity-01.mp3"></audio>
 
 

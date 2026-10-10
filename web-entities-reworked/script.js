@@ -6,6 +6,7 @@
      3. afficher le bouton "remonter en haut" quand on a défilé
      4. ouvrir les images en grand au milieu de la page
      5. transformer la vidéo de fond en animation ASCII
+        (qui réagit au son quand un lecteur joue)
    ============================================================= */
 
 
@@ -85,6 +86,7 @@ document.querySelectorAll(".player").forEach(function (lecteur) {
       tousLesSons.forEach(function (autre) {
         if (autre !== son) autre.pause();
       });
+      brancherAnalyse(son);   // le fond ASCII "écoute" ce son (section 5)
       son.play();
     } else {
       son.pause();
@@ -251,7 +253,12 @@ fenetreImage.addEventListener("click", function () {
    ATTENTION : si la page est ouverte par double-clic (adresse file://),
    Chrome interdit de lire les pixels de la vidéo. Il faut l'ouvrir avec
    un serveur local (ex. extension "Live Server" de VS Code).
-   Dans ce cas, on affiche simplement la vidéo à la place.
+   Dans ce cas, on affiche simplement la vidéo à la place
+   (et le fond ne réagit pas au son).
+
+   Quand un lecteur audio joue, le dessin réagit au son :
+     - les basses font flasher le fond (plus lumineux)
+     - les aigus provoquent des glitchs (lignes décalées, caractères brouillés)
    ------------------------------------------------------------- */
 
 // Réglages : change ces valeurs pour modifier le rendu
@@ -263,6 +270,11 @@ const LUMINOSITE   = 0.85;         // > 1 : couleurs plus vives, < 1 : plus somb
 const CONTRASTE    = 2.4;          // > 1 : plus de cases vides dans les zones sombres
 const EN_COULEUR   = true;         // false : tout en gris clair
 
+// Réaction au son (quand un lecteur audio joue)
+const REACTION_LUMIERE = 0.6;      // les coups de basse font "flasher" le fond (0 = pas d'effet)
+const REACTION_GLITCH  = 0.6;      // les aigus décalent / brouillent les caractères (0 = pas d'effet)
+const IMAGES_PAR_SECONDE_SON = 30; // dessin plus fluide pendant la musique
+
 const video  = document.querySelector(".ascii-source");
 const dessin = document.querySelector(".ascii-bg");
 const ctx    = dessin.getContext("2d");
@@ -273,7 +285,76 @@ const ctxLecture = lecture.getContext("2d", { willReadFrequently: true });
 
 // Moins d'images par seconde si la personne a demandé "réduire les animations"
 const animationsReduites = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const intervalle = 1000 / (animationsReduites ? 3 : IMAGES_PAR_SECONDE);
+
+// Temps entre deux dessins, en millisecondes
+function intervalle() {
+  if (animationsReduites) return 1000 / 3;
+  return 1000 / (sonEnCours() ? IMAGES_PAR_SECONDE_SON : IMAGES_PAR_SECONDE);
+}
+
+
+/* ----- Écoute du son -----
+   Le son des lecteurs passe par un "analyseur" (Web Audio API) qui mesure,
+   à chaque instant, l'énergie des basses et des aigus. */
+
+let contexteAudio = null;   // créé au premier clic sur ▶ (les navigateurs l'exigent)
+let analyseur = null;
+let frequences = null;      // tableau des volumes par fréquence (0 à 255)
+let niveauGraves = 0;       // les "coups" de basse, entre 0 et 1
+let niveauAigus = 0;        // l'énergie des aigus, entre 0 et 1
+let moyenneGraves = 0;      // niveau habituel des basses (pour repérer les coups)
+
+// Appelée par les lecteurs (section 1) juste avant de jouer un son
+function brancherAnalyse(son) {
+  // En file:// (double-clic), le navigateur rendrait le son muet : on ne branche rien
+  if (location.protocol === "file:" || !window.AudioContext) return;
+
+  if (!contexteAudio) {
+    contexteAudio = new AudioContext();
+    analyseur = contexteAudio.createAnalyser();
+    analyseur.fftSize = 256;                     // 128 bandes de fréquences
+    analyseur.smoothingTimeConstant = 0.75;      // évite les à-coups
+    analyseur.connect(contexteAudio.destination); // le son continue jusqu'aux haut-parleurs
+    frequences = new Uint8Array(analyseur.frequencyBinCount);
+  }
+  if (contexteAudio.state === "suspended") contexteAudio.resume();
+
+  // Un même son ne peut être branché qu'une seule fois
+  if (!son.estBranche) {
+    contexteAudio.createMediaElementSource(son).connect(analyseur);
+    son.estBranche = true;
+  }
+}
+
+function sonEnCours() {
+  return tousLesSons.some(function (son) { return !son.paused; });
+}
+
+// Moyenne des volumes entre deux bandes de fréquences, entre 0 et 1
+function moyenne(debut, fin) {
+  let total = 0;
+  for (let k = debut; k < fin; k++) total += frequences[k];
+  return total / (fin - debut) / 255;
+}
+
+// Met à jour niveauGraves et niveauAigus (appelée à chaque dessin)
+function mesurerSon() {
+  let graves = 0;
+  let aigus = 0;
+  if (analyseur && sonEnCours()) {
+    analyseur.getByteFrequencyData(frequences);
+    graves = moyenne(0, 8);      // ~0-1400 Hz : basses, kick
+    aigus  = moyenne(30, 90);    // ~5-15 kHz : hi-hats, souffle, grésillements
+  }
+  // Un "coup" = les basses dépassent leur niveau habituel.
+  // Ainsi un son toujours fort ne garde pas le fond allumé en permanence.
+  moyenneGraves = moyenneGraves * 0.95 + graves * 0.05;
+  const coup = Math.min(1, Math.max(0, (graves - moyenneGraves) * 4));
+
+  // Lissage : monte vite, redescend doucement
+  niveauGraves = coup  > niveauGraves ? coup  : niveauGraves * 0.85;
+  niveauAigus  = aigus > niveauAigus  ? aigus : niveauAigus  * 0.8;
+}
 
 let colonnes = 0;
 let lignes = 0;
@@ -312,6 +393,12 @@ function lireVideo() {
 
 function dessinerAscii() {
   const pixels = lireVideo();
+  mesurerSon();
+
+  // Les coups de basse rendent tout plus lumineux
+  const lumiere = LUMINOSITE * (1 + niveauGraves * REACTION_LUMIERE);
+  // Les aigus déclenchent des glitchs (désactivés si "réduire les animations")
+  const glitch = animationsReduites ? 0 : niveauAigus * REACTION_GLITCH;
 
   ctx.fillStyle = "#020202";
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -319,18 +406,27 @@ function dessinerAscii() {
   ctx.textBaseline = "top";
 
   for (let y = 0; y < lignes; y++) {
+    // Glitch : certaines lignes glissent sur le côté (plus il y a d'aigus, plus c'est fréquent)
+    const decalage = Math.random() < glitch ? Math.round((Math.random() - 0.5) * glitch * 40) : 0;
+
     for (let x = 0; x < colonnes; x++) {
-      const i = (y * colonnes + x) * 4;
+      const xSource = Math.min(colonnes - 1, Math.max(0, x + decalage));
+      const i = (y * colonnes + xSource) * 4;
       const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
 
       // Luminosité perçue, entre 0 (noir) et 1 (blanc)
-      let lum = ((0.299 * r + 0.587 * g + 0.114 * b) / 255) * LUMINOSITE;
+      let lum = ((0.299 * r + 0.587 * g + 0.114 * b) / 255) * lumiere;
       lum = Math.min(1, Math.max(0, (lum - 0.5) * CONTRASTE + 0.5));   // on accentue l'écart clair / sombre
-      const caractere = CARACTERES[Math.floor(lum * (CARACTERES.length - 1))];
+      let caractere = CARACTERES[Math.floor(lum * (CARACTERES.length - 1))];
       if (caractere === " ") continue;   // case vide : rien à dessiner
 
+      // Glitch : quelques caractères sont remplacés au hasard
+      if (Math.random() < glitch * 0.2) {
+        caractere = CARACTERES[1 + Math.floor(Math.random() * (CARACTERES.length - 1))];
+      }
+
       ctx.fillStyle = EN_COULEUR
-        ? "rgb(" + Math.min(255, r * LUMINOSITE) + "," + Math.min(255, g * LUMINOSITE) + "," + Math.min(255, b * LUMINOSITE) + ")"
+        ? "rgb(" + Math.min(255, r * lumiere) + "," + Math.min(255, g * lumiere) + "," + Math.min(255, b * lumiere) + ")"
         : "#bbbbbb";
       ctx.fillText(caractere, x * LARGEUR_CASE, y * HAUTEUR_CASE);
     }
@@ -348,7 +444,7 @@ let dernierDessin = 0;
 function boucleAscii(instant) {
   if (document.body.classList.contains("ascii-indisponible")) return;   // on arrête la boucle
 
-  if (instant - dernierDessin >= intervalle && video.readyState >= 2) {   // 2 = une image est prête
+  if (instant - dernierDessin >= intervalle() && video.readyState >= 2) {   // 2 = une image est prête
     dernierDessin = instant;
     try {
       dessinerAscii();

@@ -1,10 +1,11 @@
 /* =============================================================
    WEB ENTITIES (reworked) — script propre à cette page
-   Quatre fonctions :
+   Cinq fonctions :
      1. construire et faire marcher les lecteurs audio (.player)
      2. le bandeau défilant qu'on peut attraper et faire glisser
      3. afficher le bouton "remonter en haut" quand on a défilé
      4. ouvrir les images en grand au milieu de la page
+     5. transformer la vidéo de fond en animation ASCII
    ============================================================= */
 
 
@@ -236,3 +237,133 @@ images.forEach(function (image) {
 fenetreImage.addEventListener("click", function () {
   fenetreImage.close();
 });
+
+
+/* -------------------------------------------------------------
+   5. FOND ANIMÉ ASCII
+   Plusieurs fois par seconde :
+     a. on réduit l'image actuelle de la vidéo à une petite grille
+        (1 pixel = 1 case de texte)
+     b. pour chaque case, on choisit un caractère selon la luminosité
+        (sombre -> " ", clair -> "@") et on garde la couleur du pixel
+     c. on dessine ces caractères dans le <canvas> plein écran
+
+   ATTENTION : si la page est ouverte par double-clic (adresse file://),
+   Chrome interdit de lire les pixels de la vidéo. Il faut l'ouvrir avec
+   un serveur local (ex. extension "Live Server" de VS Code).
+   Dans ce cas, on affiche simplement la vidéo à la place.
+   ------------------------------------------------------------- */
+
+// Réglages : change ces valeurs pour modifier le rendu
+const CARACTERES   = " .-+*=#@";   // du plus sombre au plus clair
+const LARGEUR_CASE = 10;           // largeur d'une case en pixels (plus petit = plus de détails)
+const HAUTEUR_CASE = 16;           // hauteur d'une case en pixels
+const IMAGES_PAR_SECONDE = 15;     // vitesse de rafraîchissement du dessin
+const LUMINOSITE   = 0.85;         // > 1 : couleurs plus vives, < 1 : plus sombres
+const CONTRASTE    = 2.4;          // > 1 : plus de cases vides dans les zones sombres
+const EN_COULEUR   = true;         // false : tout en gris clair
+
+const video  = document.querySelector(".ascii-source");
+const dessin = document.querySelector(".ascii-bg");
+const ctx    = dessin.getContext("2d");
+
+// Petit canvas invisible qui sert à lire les pixels de la vidéo réduite
+const lecture    = document.createElement("canvas");
+const ctxLecture = lecture.getContext("2d", { willReadFrequently: true });
+
+// Moins d'images par seconde si la personne a demandé "réduire les animations"
+const animationsReduites = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const intervalle = 1000 / (animationsReduites ? 3 : IMAGES_PAR_SECONDE);
+
+let colonnes = 0;
+let lignes = 0;
+
+// Adapte la taille du dessin à la fenêtre
+function redimensionner() {
+  const ratio = window.devicePixelRatio || 1;   // écrans "retina" : dessin plus net
+  dessin.width  = window.innerWidth  * ratio;
+  dessin.height = window.innerHeight * ratio;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+  colonnes = Math.ceil(window.innerWidth  / LARGEUR_CASE);
+  lignes   = Math.ceil(window.innerHeight / HAUTEUR_CASE);
+  lecture.width  = colonnes;
+  lecture.height = lignes;
+}
+redimensionner();
+window.addEventListener("resize", redimensionner);
+
+// Copie l'image actuelle de la vidéo dans la petite grille,
+// en la recadrant pour qu'elle remplisse tout l'écran (comme object-fit: cover)
+function lireVideo() {
+  const ecran = (colonnes * LARGEUR_CASE) / (lignes * HAUTEUR_CASE);   // proportions de l'écran
+  const film  = video.videoWidth / video.videoHeight;                  // proportions de la vidéo
+  let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
+  if (film > ecran) {
+    sw = sh * ecran;                     // vidéo trop large : on coupe les côtés
+    sx = (video.videoWidth - sw) / 2;
+  } else {
+    sh = sw / ecran;                     // vidéo trop haute : on coupe le haut et le bas
+    sy = (video.videoHeight - sh) / 2;
+  }
+  ctxLecture.drawImage(video, sx, sy, sw, sh, 0, 0, colonnes, lignes);
+  return ctxLecture.getImageData(0, 0, colonnes, lignes).data;   // [r, g, b, a, r, g, b, a, …]
+}
+
+function dessinerAscii() {
+  const pixels = lireVideo();
+
+  ctx.fillStyle = "#020202";
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  ctx.font = HAUTEUR_CASE - 2 + 'px "BPdotsUnicasePlus", monospace';
+  ctx.textBaseline = "top";
+
+  for (let y = 0; y < lignes; y++) {
+    for (let x = 0; x < colonnes; x++) {
+      const i = (y * colonnes + x) * 4;
+      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+
+      // Luminosité perçue, entre 0 (noir) et 1 (blanc)
+      let lum = ((0.299 * r + 0.587 * g + 0.114 * b) / 255) * LUMINOSITE;
+      lum = Math.min(1, Math.max(0, (lum - 0.5) * CONTRASTE + 0.5));   // on accentue l'écart clair / sombre
+      const caractere = CARACTERES[Math.floor(lum * (CARACTERES.length - 1))];
+      if (caractere === " ") continue;   // case vide : rien à dessiner
+
+      ctx.fillStyle = EN_COULEUR
+        ? "rgb(" + Math.min(255, r * LUMINOSITE) + "," + Math.min(255, g * LUMINOSITE) + "," + Math.min(255, b * LUMINOSITE) + ")"
+        : "#bbbbbb";
+      ctx.fillText(caractere, x * LARGEUR_CASE, y * HAUTEUR_CASE);
+    }
+  }
+}
+
+// Si la lecture des pixels est interdite : on affiche la vidéo telle quelle
+function passerEnModeVideo(erreur) {
+  console.warn("Fond ASCII indisponible (ouvre la page avec un serveur local, ex. Live Server) :", erreur);
+  document.body.classList.add("ascii-indisponible");
+}
+
+let dernierDessin = 0;
+
+function boucleAscii(instant) {
+  if (document.body.classList.contains("ascii-indisponible")) return;   // on arrête la boucle
+
+  if (instant - dernierDessin >= intervalle && video.readyState >= 2) {   // 2 = une image est prête
+    dernierDessin = instant;
+    try {
+      dessinerAscii();
+    } catch (erreur) {
+      passerEnModeVideo(erreur);
+      return;
+    }
+  }
+  requestAnimationFrame(boucleAscii);
+}
+
+// Certains navigateurs bloquent la lecture automatique : on la relance au besoin
+video.muted = true;
+video.play().catch(function () {
+  document.addEventListener("pointerdown", function () { video.play(); }, { once: true });
+});
+
+requestAnimationFrame(boucleAscii);

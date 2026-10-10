@@ -12,6 +12,19 @@
 <body id="top">
 
   <!-- =========================================================
+       0. FOND ANIMÉ EN ASCII
+       La vidéo est cachée : script.js la lit image par image et la
+       redessine avec des caractères (. - + * # @) dans le <canvas>,
+       qui reste fixe en plein écran derrière tout le reste.
+       ========================================================= -->
+  <video class="ascii-source" src="video/clouds.mp4" muted loop playsinline autoplay></video>
+  <canvas class="ascii-bg" aria-hidden="true"></canvas>
+
+  <!-- La colonne noire floutée : elle contient tout le texte de la page
+       (en-tête, forum, pied de page) et défile avec lui, par-dessus l'animation. -->
+  <div class="colonne">
+
+  <!-- =========================================================
        1. EN-TÊTE : logo, titre, sous-titre, règles qui défilent
           (structure reprise de exoportal.xyz/pond-skum-lounge)
        ========================================================= -->
@@ -241,15 +254,6 @@
 
   </main>
 
-  <!-- Fenêtre pour afficher une image en grand, au milieu de la page.
-       Elle est vide au départ : script.js y met l'image sur laquelle on a cliqué. -->
-  <dialog class="lightbox">
-    <img src="" alt="">
-  </dialog>
-
-  <!-- Bouton "remonter en haut" (apparaît quand on a défilé, voir script.js) -->
-  <a class="to-top" href="#top" aria-label="Remonter en haut">▲</a>
-
   <!-- =========================================================
        3. PIED DE PAGE
        ========================================================= -->
@@ -263,6 +267,18 @@
     </p>
     <a class="btn" href="../">⟵ back to repository</a>
   </footer>
+
+  </div><!-- fin de la colonne -->
+
+  <!-- Fenêtre pour afficher une image en grand, au milieu de la page.
+       Elle est vide au départ : script.js y met l'image sur laquelle on a cliqué. -->
+  <dialog class="lightbox">
+    <img src="" alt="">
+  </dialog>
+
+  <!-- Bouton "remonter en haut" (apparaît quand on a défilé, voir script.js) -->
+  <a class="to-top" href="#top" aria-label="Remonter en haut">▲</a>
+
 
   <!-- Le script est chargé à la fin pour que tout le HTML existe déjà -->
   <script src="script.js"></script>

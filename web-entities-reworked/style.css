@@ -90,6 +90,71 @@ a {
 
 
 /* -------------------------------------------------------------
+   2b. FOND ANIMÉ ASCII + COLONNE NOIRE FLOUTÉE
+   Ordre d'empilement, du fond vers l'avant :
+     1. le <canvas> ASCII (fixe, plein écran)
+     2. la colonne noire aux bords flous (défile avec le texte)
+     3. le texte de la page
+   ------------------------------------------------------------- */
+
+/* La vidéo source : présente mais invisible (script.js la lit image par image) */
+.ascii-source {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Le dessin en caractères, fixe derrière tout le reste */
+.ascii-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+}
+
+/* Si l'ASCII ne peut pas être calculé (page ouverte par double-clic,
+   voir script.js), on affiche simplement la vidéo, assombrie */
+.ascii-indisponible .ascii-source {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+
+.ascii-indisponible .ascii-bg {
+  display: none;
+}
+
+/* La colonne : elle contient le texte et défile avec lui.
+   Les marges du haut et du bas laissent voir l'animation autour. */
+.colonne {
+  position: relative;
+  z-index: 1;                       /* au-dessus du canvas */
+  width: min(100% - 32px, calc(var(--largeur-colonne) + 80px));
+  margin: 160px auto;               /* espace en haut et en bas de la colonne */
+  padding: 8px 8px;
+}
+
+/* Le fond noir aux bords flous, dessiné derrière le contenu de la colonne.
+   Le flou vient de l'ombre (box-shadow) : augmente 60px pour des bords plus doux. */
+.colonne::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--noir);
+  border-radius: 32px;
+  box-shadow: 0 0 60px 40px var(--noir);
+}
+
+
+/* -------------------------------------------------------------
    3. EN-TÊTE
    ------------------------------------------------------------- */
 .masthead {

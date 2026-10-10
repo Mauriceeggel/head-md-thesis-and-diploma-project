@@ -1,7 +1,8 @@
 # 𖥋 Process 𖥋
 
 <hr> This folder contains various notes, references, sketches, images, ideas, etc. <br>
-Each entry is dated and arranged in reverse chronological order. <hr>
+Each entry is dated and arranged in reverse chronological order. 
+<hr>
 
 # 𖨠 26.10.07 - Designing questions & reflections 𖨠 <br> (w/ Alexia Mathieu) 
 

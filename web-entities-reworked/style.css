@@ -1,0 +1,488 @@
+/* =============================================================
+   WEB ENTITIES (reworked) — structure inspirée de
+   exoportal.xyz/pond-skum-lounge (un forum / message board).
+   Fichier propre à cette page uniquement.
+   ============================================================= */
+
+
+/* -------------------------------------------------------------
+   0. POLICES (fichiers dans fonts/ARK-ES Full Family — Stuedio/)
+   - BPdotsUnicasePlus : tout le texte de la page
+   - ARK-ES Solid      : uniquement le grand titre "web entities"
+   ------------------------------------------------------------- */
+@font-face {
+  font-family: "BPdotsUnicasePlus";
+  src: url("fonts/ARK-ES Full Family — Stuedio/BPdotsUnicasePlus.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ARK-ES Solid";
+  src: url("fonts/ARK-ES Full Family — Stuedio/Webfonts/ARK-ES-SolidRegular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* -------------------------------------------------------------
+   1. VARIABLES
+   Change une couleur ici et elle change partout sur la page.
+   (Ce sont les couleurs utilisées par la page de référence.)
+   ------------------------------------------------------------- */
+:root {
+  --noir:   #020202;   /* fond de page, barres de titre, texte des messages */
+  --blanc:  #ffffff;   /* couleur principale : titre, glyphes, bordures */
+  --gris:   #bbbbbb;   /* fond des fils de discussion */
+  --violet: #8b89e0;   /* couleur d'accent : survol, lecture en cours */
+
+  --police-texte: "BPdotsUnicasePlus", ui-monospace, "Courier New", monospace;   /* tout le texte */
+  --police-titre: "ARK-ES Solid", ui-monospace, "Courier New", monospace;        /* le grand titre seulement */
+
+  --bordure: 1px dotted var(--blanc);    /* les pointillés typiques d'Exoportal */
+  --separateur: 1px solid rgba(0, 0, 0, 0.2);   /* ligne entre deux messages */
+  --cadre: 1px solid #ffffff;           /* fine ligne blanche autour de chaque fil */
+  --largeur-colonne: 600px;             /* largeur de la colonne du forum */
+}
+
+
+/* -------------------------------------------------------------
+   2. BASE
+   ------------------------------------------------------------- */
+* {
+  box-sizing: border-box;   /* la bordure est comptée dans la largeur */
+}
+
+html {
+  scroll-behavior: smooth;  /* défilement doux vers les ancres (#faq, #top…) */
+}
+
+body {
+  margin: 0;
+  background: var(--noir);
+  color: var(--blanc);
+  font-family: var(--police-texte);
+  font-weight: normal;
+  line-height: 1.4;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--violet);
+  color: var(--noir);
+}
+
+
+/* -------------------------------------------------------------
+   3. EN-TÊTE
+   ------------------------------------------------------------- */
+.masthead {
+  max-width: var(--largeur-colonne);
+  margin: 0 auto;
+  padding: 48px 16px 0;
+  text-align: center;
+}
+
+.masthead-glyph {
+  display: block;
+  font-size: 56px;
+  line-height: 1;
+}
+
+.masthead-title {
+  font-family: var(--police-titre);
+  font-weight: normal;
+  font-size: clamp(28px, 7vw, 48px);  /* taille qui s'adapte à l'écran */
+  margin: 8px 0 16px;
+}
+
+/* Le sous-titre sur fond gris, comme "GENERAL MESSAGE BOARD 4 DRIFTERS…" */
+.masthead-tagline span {
+  background: var(--gris);
+  color: var(--noir);
+  font-size: 16px;
+  line-height: 1.7;
+  padding: 2px 6px;
+  /* garde le fond gris propre quand le texte passe à la ligne */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Bandeau défilant avec les règles du forum (remplace <marquee>) */
+.ticker {
+  margin: 16px 0 40px;
+  overflow: hidden;            /* cache ce qui dépasse */
+  white-space: nowrap;         /* tout sur une seule ligne */
+  color: var(--gris);
+  font-size: 12px;
+  cursor: grab;                /* petite main : on peut l'attraper */
+  user-select: none;           /* évite de sélectionner le texte en glissant */
+  -webkit-user-select: none;
+  touch-action: pan-y;         /* sur téléphone : glisser à l'horizontale attrape le texte */
+}
+
+/* Pendant qu'on maintient le clic (classe ajoutée par script.js) */
+.ticker.is-grabbed {
+  cursor: grabbing;
+}
+
+/* Le défilement est géré par script.js (section 2) : la vitesse se règle là-bas */
+.ticker-track {
+  display: inline-block;
+  will-change: transform;
+}
+
+
+/* -------------------------------------------------------------
+   4. LE FORUM : une colonne centrée de fils de discussion
+   ------------------------------------------------------------- */
+.board {
+  max-width: var(--largeur-colonne);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+
+/* -------------------------------------------------------------
+   5. UN FIL DE DISCUSSION (thread)
+   ------------------------------------------------------------- */
+.thread {
+  background: var(--gris);
+  border: var(--cadre);       /* le cadre blanc englobe le titre ET les messages */
+  color: var(--noir);
+  margin-bottom: 48px;
+  scroll-margin-top: 16px;   /* petit espace quand on arrive via une ancre */
+}
+
+/* La barre noire avec le titre "# …" */
+.thread-head {
+  background: var(--noir);
+  padding: 8px 16px;
+  border-bottom: var(--cadre);   /* ligne blanche entre le titre et les messages */
+  font-weight: normal;
+  font-size: 15px;
+}
+
+.thread-head a {
+  color: var(--gris);
+  transition: color 0.3s;
+}
+
+.thread-head a:hover,
+.thread-head a:focus-visible {
+  color: #888888;
+}
+
+
+/* -------------------------------------------------------------
+   6. UN MESSAGE (post)
+   2 colonnes : pseudo + photo à gauche, texte à droite.
+   ------------------------------------------------------------- */
+.post {
+  display: grid;
+  grid-template-columns: 76px 1fr;   /* largeur de la colonne pseudo + photo */
+  gap: 16px;
+  padding: 16px;
+}
+
+/* La ligne fine entre deux messages d'un même fil */
+.post + .post {
+  border-top: var(--separateur);
+}
+
+.username {
+  font-family: var(--police-texte);
+  font-size: 9px;
+  overflow-wrap: anywhere;   /* un pseudo trop long passe à la ligne */
+}
+
+/* Photo de profil : petits avatars en pixel art (img/avatars/) */
+.avatar {
+  width: 64px;
+  height: 64px;
+  margin-top: 4px;
+  image-rendering: pixelated;   /* garde les pixels nets */
+}
+
+.post-content {
+  min-width: 0;         /* évite que les longs mots élargissent la grille */
+  font-size: 14px;
+}
+
+/* Espace entre les paragraphes d'un même message */
+.post-content > * + * {
+  margin-top: 12px;
+}
+
+/* Le type + la date de l'entité, en haut du message d'origine */
+.post-meta {
+  display: inline-block;
+  background: var(--noir);
+  color: var(--gris);
+  font-size: 11px;
+  padding: 1px 4px;
+}
+
+
+/* -------------------------------------------------------------
+   7. PIÈCES JOINTES (image + lecteurs)
+   ------------------------------------------------------------- */
+.attachment-label,
+.player-caption {
+  font-family: var(--police-texte);
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+
+.attachment img {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+
+
+/* -------------------------------------------------------------
+   8. LECTEUR AUDIO
+   ▶  00:00  [====barre====]  00:55  🔊 [==volume==]
+   Le contenu est créé par script.js (section 1).
+   ------------------------------------------------------------- */
+.player {
+  --lecteur-accent: var(--blanc);   /* temps + volume. Mets #a88666 pour le brun de la référence */
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--noir);
+  color: var(--gris);
+}
+
+/* Les deux boutons (lecture et haut-parleur) : on enlève le style par défaut */
+.player-btn,
+.player-mute {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--gris);
+  cursor: pointer;
+}
+
+.player-btn {
+  width: 18px;
+  height: 18px;
+}
+
+.player-mute {
+  width: 22px;
+  height: 18px;
+}
+
+.player-btn svg,
+.player-mute svg {
+  width: 100%;
+  height: 100%;
+}
+
+.player-btn:hover,
+.player-mute:hover {
+  color: var(--violet);
+}
+
+/* 00:00 (à gauche : où on en est) et 00:55 (à droite : durée totale) */
+.player-time {
+  flex-shrink: 0;
+  color: var(--lecteur-accent);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;   /* les chiffres gardent la même largeur */
+}
+
+/* Les deux barres arrondies : progression et volume */
+.player-bar,
+.player-volume {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--gris);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;   /* sur téléphone : glisser règle la barre au lieu de faire défiler */
+}
+
+.player-bar {
+  flex: 1;              /* prend toute la place qui reste */
+  min-width: 30px;
+}
+
+.player-volume {
+  flex: 0 1 90px;
+  min-width: 40px;
+}
+
+/* La partie remplie de chaque barre (largeur modifiée en direct par script.js) */
+.player-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--lecteur-accent);
+}
+
+/* Lecteur en cours de lecture (classe ajoutée par script.js) */
+.player.is-playing .player-btn {
+  color: var(--violet);
+}
+
+.player.is-playing .player-bar .player-fill {
+  background: var(--violet);
+}
+
+
+/* -------------------------------------------------------------
+   9. IMAGE EN PLEIN ÉCRAN (lightbox)
+   Les images des messages s'ouvrent au milieu de la page
+   (voir script.js). Les photos de profil (.avatar) ne sont pas concernées.
+   ------------------------------------------------------------- */
+.attachment img {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: var(--cadre);
+  background: var(--noir);
+  cursor: zoom-out;
+  outline: none;   /* enlève le contour bleu que le navigateur ajoute à l'ouverture */
+}
+
+.lightbox img {
+  max-width: calc(100vw - 34px);
+  max-height: calc(100vh - 34px);
+  object-fit: contain;
+}
+
+/* Le fond derrière l'image : assombri et légèrement flouté */
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);         /* change 6px pour flouter + ou − */
+}
+
+
+/* -------------------------------------------------------------
+   10. BOUTON "REMONTER EN HAUT"
+   ------------------------------------------------------------- */
+.to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: rgba(187, 187, 187, 0.3);
+  color: var(--gris);
+  font-size: 14px;
+  opacity: 0;                 /* invisible au départ */
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+/* Classe ajoutée par script.js quand on a défilé vers le bas */
+.to-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.to-top:hover {
+  color: var(--violet);
+}
+
+
+/* -------------------------------------------------------------
+   11. PIED DE PAGE
+   ------------------------------------------------------------- */
+.footer {
+  text-align: center;
+  padding: 16px 16px 64px;
+}
+
+.footer-line {
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+
+.footer .masthead-glyph {
+  font-size: 40px;
+}
+
+.footer-credits {
+  font-size: 12px;
+  margin: 16px 0 24px;
+}
+
+/* Bouton "back to repository" : texte seul, sans fond */
+.btn {
+  display: inline-block;
+  padding: 8px 20px;
+  color: var(--blanc);
+  font-size: 13px;
+}
+
+.btn:hover {
+  color: var(--violet);
+}
+
+
+/* -------------------------------------------------------------
+   12. RESPONSIVE (petits écrans)
+   ------------------------------------------------------------- */
+@media (max-width: 520px) {
+  .player-volume {
+    display: none;
+  }
+
+  .player {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .post {
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .username {
+    font-size: 7px;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .post-content {
+    font-size: 12px;
+  }
+}

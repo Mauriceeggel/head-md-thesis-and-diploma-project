@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Entities</title>
+
+  <!-- Feuille de style propre à cette page
+       (les polices BPdotsUnicasePlus et ARK-ES y sont chargées, depuis le dossier fonts/) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body id="top">
+
+  <!-- =========================================================
+       1. EN-TÊTE : logo, titre, sous-titre, règles qui défilent
+          (structure reprise de exoportal.xyz/pond-skum-lounge)
+       ========================================================= -->
+  <header class="masthead">
+    <a class="masthead-glyph" href="#top">𖠋</a>
+    <h1 class="masthead-title">web entities</h1>
+    <p class="masthead-tagline">
+      <span>「this page documents various entities and artifacts encountered within the machine.」</span>
+    </p>
+
+    <!-- Bandeau défilant. Le texte est écrit DEUX fois à l'identique :
+         l'animation CSS fait glisser le tout de 50 % pour une boucle sans à-coup. -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>(rule_1) do not feed the parasites. (rule_2) always upload your extractions. (rule_3) if a pixel starts to stretch, do not look away. (rule_4) no stupid questions, read the faq first. &nbsp;&nbsp;&nbsp;</span>
+        <span>(rule_1) do not feed the parasites. (rule_2) always upload your extractions. (rule_3) if a pixel starts to stretch, do not look away. (rule_4) no stupid questions, read the faq first. &nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       2. FORUM : une seule colonne centrée, une suite de "fils" (threads)
+
+       Un fil = <article class="thread"> :
+         - .thread-head : la barre noire avec le titre "# …"
+         - puis un ou plusieurs <div class="post"> (le message d'origine + les réponses)
+
+       Un message = <div class="post"> :
+         - .post-user    : pseudo + photo de profil (dans img/avatars/)
+         - .post-content : le texte, et éventuellement des pièces jointes
+
+       Pour AJOUTER une entité : copie un <article class="thread"> en entier,
+       colle-le juste après le fil FAQ, puis change l'id, les textes, l'image et les sons.
+       ========================================================= -->
+  <main class="board">
+
+    <!-- ===== FIL ÉPINGLÉ : FAQ ===== -->
+    <article class="thread" id="faq">
+      <h2 class="thread-head"><a href="#faq"># web entities megathread / faq</a></h2>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ARCHIV1ST</p>
+          <img class="avatar" src="img/avatars/archiv1st.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>ALRIGHT . . . PPL KEEP ASKING THE SAME THINGS SO HERE IS A MASTERTHREAD. EVERY ENTITY I MANAGE TO CATCH GETS ITS OWN THREAD BELOW, WITH THE IMAGE + THE EXTRACTED SOUND.</p>
+          <p>*** FREQUENTLY ASKED QUESTIONS ***</p>
+          <p>Q: WHAT IS A WEB ENTITY?<br>
+             A: SOMETHING THAT LIVES INSIDE THE MACHINE AND WAS NEVER SUPPOSED TO BE THERE. SOMETIMES U SEE IT, SOMETIMES U ONLY HEAR IT.</p>
+          <p>Q: WHAT DO THE TYPES MEAN?<br>
+             A: parasite = EATS STUFF (CODE, FILES, UR PATIENCE). anomaly = HARDWARE BEHAVING WRONG. pur energy = NO BODY AT ALL, JUST SIGNAL.</p>
+          <p>Q: R THEY DANGEROUS?<br>
+             A: DUNNO. MOSTLY ANNOYING.</p>
+        </div>
+      </div>
+    </article>
+
+
+    <!-- ===== ENTITÉ #03 ===== -->
+    <article class="thread" id="entity-03">
+      <h2 class="thread-head"><a href="#entity-03"># ⛮ 𖢿 code bug</a></h2>
+
+      <!-- Message d'origine -->
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ARCHIV1ST</p>
+          <img class="avatar" src="img/avatars/archiv1st.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p class="post-meta">parasite - 26·05·06</p>
+          <p>// this lil’ guy is messing me up! every time i think everything is finally working, he shows up, sneaks into my readmes, and starts eating chunks of my code •`ᴖ´• !!! //</p>
+
+          <!-- Pièce jointe : image + lecteur.
+               Le lecteur joue le fichier indiqué dans data-src.
+               Il est vide ici : script.js le remplit (bouton, temps, barre, volume). -->
+          <div class="attachment">
+            <p class="attachment-label">⌖ user has uploaded an attachment:</p>
+            <img src="img/web-entity-03.jpeg" alt="Web entity #03 — code bug" loading="lazy">
+            <div class="player" data-src="audio/web-entity-03.mp3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Réponses -->
+      <div class="post">
+        <div class="post-user">
+          <p class="username">NULLPOINTR</p>
+          <img class="avatar" src="img/avatars/nullpointr.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>LMAO SAME ONE HAS BEEN LIVING IN MY NODE_MODULES FOR MONTHS. I JUST LEAVE IT A FEW SEMICOLONS EVERY MORNING AND IT KINDA LEAVES ME ALONE.</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ANON4471</p>
+          <img class="avatar" src="img/avatars/anon4471.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>RULE_1 . . . DO NOT FEED THE PARASITES. U R MAKING IT WORSE 4 EVERYONE.</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">GL1TCHWYRM</p>
+          <img class="avatar" src="img/avatars/gl1tchwyrm.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>THE CRUNCHY NOISE AT THE START IS ACTUALLY IT CHEWING. PUT HEADPHONES ON. U CAN HEAR THE BRACKETS BREAKING.</p>
+        </div>
+      </div>
+    </article>
+
+
+    <!-- ===== ENTITÉ #02 ===== -->
+    <article class="thread" id="entity-02">
+      <h2 class="thread-head"><a href="#entity-02"># ⛮ 𖢳 stretched pixel</a></h2>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ARCHIV1ST</p>
+          <img class="avatar" src="img/avatars/archiv1st.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p class="post-meta">anomaly - 26·04·17</p>
+          <p>// i had just received a new monitor that day. after a few minutes of use, i noticed that one of the pixels had begun to stretch. it was emitting a barely audible sound. after several attempts, i eventually managed to extract its data. the entry below contains the refined file, along with one of my earliest extraction attempts. //</p>
+
+          <div class="attachment">
+            <p class="attachment-label">⌖ user has uploaded an attachment:</p>
+            <img src="img/web-entity-02.jpeg" alt="Web entity #02 — stretched pixel" loading="lazy">
+
+            <p class="player-caption">*refined file</p>
+            <div class="player" data-src="audio/web-entity-02.mp3"></div>
+
+            <p class="player-caption">*early extraction attempt [damaged]</p>
+            <div class="player" data-src="audio/web-entity-02-damaged.mp3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">PIXELMUD3</p>
+          <img class="avatar" src="img/avatars/pixelmud3.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>WAIT DID U RETURN THE MONITOR??? PLS TELL ME U DIDN’T RETURN THE MONITOR.</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ARCHIV1ST</p>
+          <img class="avatar" src="img/avatars/archiv1st.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>STILL ON MY DESK. THE PIXEL IS ABOUT 3CM LONG NOW.</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ANON20936</p>
+          <img class="avatar" src="img/avatars/anon20936.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>THE DAMAGED ONE SOUNDS BETTER IMO. MORE HONEST.</p>
+        </div>
+      </div>
+    </article>
+
+
+    <!-- ===== ENTITÉ #01 ===== -->
+    <article class="thread" id="entity-01">
+      <h2 class="thread-head"><a href="#entity-01"># ⛮ 𖡺 echoes other</a></h2>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ARCHIV1ST</p>
+          <img class="avatar" src="img/avatars/archiv1st.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p class="post-meta">pur energy - 26·10·06</p>
+          <p>// echoes other took shape from voice fragments found on the web. through the process of endlessly reconstructing itself, the fragments formed a slightly opaque envelope tinged with yellow and violet. //</p>
+
+          <div class="attachment">
+            <p class="attachment-label">⌖ user has uploaded an attachment:</p>
+            <img src="img/web-entity-01.jpeg" alt="Web entity #01 — echoes other" loading="lazy">
+            <div class="player" data-src="audio/web-entity-01.mp3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">SIG_HUNTR</p>
+          <img class="avatar" src="img/avatars/sig_huntr.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>I SWEAR I HEARD MY OWN VOICE IN THERE AROUND THE MIDDLE. HAS ANYONE ELSE HAD THAT???</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">ANON7710</p>
+          <img class="avatar" src="img/avatars/anon7710.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>YES. THAT’S HOW IT GROWS. IT PICKS UP WHOEVER IS LISTENING.</p>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-user">
+          <p class="username">DRAINFLY99</p>
+          <img class="avatar" src="img/avatars/drainfly99.svg" alt="">
+        </div>
+        <div class="post-content">
+          <p>COOL COOL COOL. NOT LISTENING TO IT AGAIN THEN.</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Fenêtre pour afficher une image en grand, au milieu de la page.
+       Elle est vide au départ : script.js y met l'image sur laquelle on a cliqué. -->
+  <dialog class="lightbox">
+    <img src="" alt="">
+  </dialog>
+
+  <!-- Bouton "remonter en haut" (apparaît quand on a défilé, voir script.js) -->
+  <a class="to-top" href="#top" aria-label="Remonter en haut">▲</a>
+
+  <!-- =========================================================
+       3. PIED DE PAGE
+       ========================================================= -->
+  <footer class="footer">
+    <p class="footer-line">_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _</p>
+    <p class="masthead-glyph">𖠋</p>
+    <p class="footer-credits">
+      web entities 2026<br>
+      servers managed by archiv1st<br>
+      𓄺 ◙ ⠕ 𐫈 ⊹ ⑈
+    </p>
+    <a class="btn" href="../">⟵ back to repository</a>
+  </footer>
+
+  <!-- Le script est chargé à la fin pour que tout le HTML existe déjà -->
+  <script src="script.js"></script>
+</body>
+</html>

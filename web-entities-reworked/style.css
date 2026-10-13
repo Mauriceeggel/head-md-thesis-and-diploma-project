@@ -136,13 +136,14 @@ a {
 .colonne {
   position: relative;
   z-index: 1;                       /* au-dessus du canvas */
-  width: min(100% - 32px, calc(var(--largeur-colonne) + 80px));
+  width: min(100% - 32px, calc(var(--largeur-colonne) + 40px));
   margin: 160px auto;               /* espace en haut et en bas de la colonne */
   padding: 8px 8px;
 }
 
 /* Le fond noir aux bords flous, dessiné derrière le contenu de la colonne.
-   Le flou vient de l'ombre (box-shadow) : augmente 60px pour des bords plus doux. */
+   Le flou vient de l'ombre (box-shadow) : 40px = largeur du flou, 12px = débord
+   autour du texte. Augmente-les pour un fond plus large et plus doux. */
 .colonne::before {
   content: "";
   position: absolute;
@@ -150,7 +151,7 @@ a {
   z-index: -1;
   background: var(--noir);
   border-radius: 32px;
-  box-shadow: 0 0 60px 40px var(--noir);
+  box-shadow: 0 0 40px 12px var(--noir);
 }
 
 

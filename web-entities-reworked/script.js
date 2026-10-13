@@ -256,9 +256,14 @@ fenetreImage.addEventListener("click", function () {
    Dans ce cas, on affiche simplement la vidéo à la place
    (et le fond ne réagit pas au son).
 
-   Quand un lecteur audio joue, le dessin réagit au son :
-     - les basses font flasher le fond (plus lumineux)
-     - les aigus provoquent des glitchs (lignes décalées, caractères brouillés)
+   Quand un lecteur audio joue, le fond devient un "spectre"
+   (comme l'analyseur de spectre du logiciel MiniMeters) :
+     - chaque ligne de l'écran écoute une plage de fréquences :
+       les basses en bas, les aigus en haut
+     - chaque plage a sa couleur : chaud (rouge, orange) pour les basses,
+       froid (cyan, bleu, violet) pour les aigus
+     - plus une plage est forte, plus sa ligne prend sa couleur,
+       se déforme (vagues, étirement) et forme une barre depuis les bords
    ------------------------------------------------------------- */
 
 // Réglages : change ces valeurs pour modifier le rendu
@@ -271,9 +276,19 @@ const CONTRASTE    = 2.4;          // > 1 : plus de cases vides dans les zones s
 const EN_COULEUR   = true;         // false : tout en gris clair
 
 // Réaction au son (quand un lecteur audio joue)
-const REACTION_LUMIERE = 0.6;      // les coups de basse font "flasher" le fond (0 = pas d'effet)
-const REACTION_GLITCH  = 0.6;      // les aigus décalent / brouillent les caractères (0 = pas d'effet)
+const REACTION_COULEUR     = 1;    // à quel point les couleurs du spectre recouvrent la vidéo (0 = pas d'effet)
+const REACTION_DEFORMATION = 1;    // vagues et étirements de l'image (0 = pas d'effet, 2 = très déformé)
+const LONGUEUR_BARRES      = 0.7;  // longueur max des barres qui partent des bords (0 = pas de barres, 1 = jusqu'au centre)
+const REACTION_LUMIERE     = 0.5;  // les coups de basse font "flasher" le fond (0 = pas d'effet)
+const REACTION_GLITCH      = 0.4;  // les aigus brouillent quelques caractères (0 = pas d'effet)
 const IMAGES_PAR_SECONDE_SON = 30; // dessin plus fluide pendant la musique
+
+// Couleurs du spectre : teinte (0-360) des basses et des aigus.
+// 0 = rouge, 30 = orange, 60 = jaune, 120 = vert, 190 = cyan, 240 = bleu, 270 = violet
+const TEINTE_BASSES = 0;
+const TEINTE_AIGUS  = 270;
+const FREQUENCE_MIN = 40;          // fréquence de la ligne du bas, en Hz
+const FREQUENCE_MAX = 16000;       // fréquence de la ligne du haut, en Hz
 
 const video  = document.querySelector(".ascii-source");
 const dessin = document.querySelector(".ascii-bg");
@@ -294,8 +309,8 @@ function intervalle() {
 
 
 /* ----- Écoute du son -----
-   Le son des lecteurs passe par un "analyseur" (Web Audio API) qui mesure,
-   à chaque instant, l'énergie des basses et des aigus. */
+   Le son des lecteurs passe par un "analyseur" (Web Audio API) qui découpe
+   le son en fréquences et mesure le volume de chacune, à chaque instant. */
 
 let contexteAudio = null;   // créé au premier clic sur ▶ (les navigateurs l'exigent)
 let analyseur = null;
@@ -303,6 +318,12 @@ let frequences = null;      // tableau des volumes par fréquence (0 à 255)
 let niveauGraves = 0;       // les "coups" de basse, entre 0 et 1
 let niveauAigus = 0;        // l'énergie des aigus, entre 0 et 1
 let moyenneGraves = 0;      // niveau habituel des basses (pour repérer les coups)
+
+// Pour chaque ligne de l'écran : sa plage de fréquences, son niveau et sa couleur
+let bandes = [];            // niveau de chaque ligne, entre 0 et 1
+let plages = [];            // { debut, fin } : les cases de "frequences" écoutées par la ligne
+let couleurs = [];          // [r, g, b] : la couleur de la ligne
+let plafond = 0.2;          // le plus fort volume entendu récemment (volume automatique)
 
 // Appelée par les lecteurs (section 1) juste avant de jouer un son
 function brancherAnalyse(son) {
@@ -312,10 +333,13 @@ function brancherAnalyse(son) {
   if (!contexteAudio) {
     contexteAudio = new AudioContext();
     analyseur = contexteAudio.createAnalyser();
-    analyseur.fftSize = 256;                     // 128 bandes de fréquences
-    analyseur.smoothingTimeConstant = 0.75;      // évite les à-coups
+    analyseur.fftSize = 2048;                    // 1024 bandes : assez fin pour séparer les basses
+    analyseur.smoothingTimeConstant = 0.7;       // évite les à-coups
+    analyseur.minDecibels = -85;                 // en dessous : considéré comme silence
+    analyseur.maxDecibels = -20;                 // au dessus : volume maximum
     analyseur.connect(contexteAudio.destination); // le son continue jusqu'aux haut-parleurs
     frequences = new Uint8Array(analyseur.frequencyBinCount);
+    preparerSpectre();
   }
   if (contexteAudio.state === "suspended") contexteAudio.resume();
 
@@ -330,28 +354,87 @@ function sonEnCours() {
   return tousLesSons.some(function (son) { return !son.paused; });
 }
 
-// Moyenne des volumes entre deux bandes de fréquences, entre 0 et 1
+// Moyenne des volumes entre deux cases de fréquences, entre 0 et 1
 function moyenne(debut, fin) {
   let total = 0;
   for (let k = debut; k < fin; k++) total += frequences[k];
   return total / (fin - debut) / 255;
 }
 
-// Met à jour niveauGraves et niveauAigus (appelée à chaque dessin)
+// Transforme une teinte (0-360) en couleur [r, g, b] vive
+function teinteEnRgb(teinte) {
+  const h = teinte / 60;
+  const x = 255 * (1 - Math.abs((h % 2) - 1));
+  if (h < 1) return [255, x, 0];
+  if (h < 2) return [x, 255, 0];
+  if (h < 3) return [0, 255, x];
+  if (h < 4) return [0, x, 255];
+  if (h < 5) return [x, 0, 255];
+  return [255, 0, x];
+}
+
+// Calcule, pour chaque ligne, sa plage de fréquences et sa couleur.
+// L'échelle est "logarithmique" (comme l'oreille) : chaque octave a la même hauteur.
+function preparerSpectre() {
+  bandes = new Array(lignes).fill(0);
+  plages = [];
+  couleurs = [];
+  const hzParCase = contexteAudio ? contexteAudio.sampleRate / analyseur.fftSize : 21.5;
+  const nombreCases = frequences ? frequences.length : 1024;
+
+  for (let y = 0; y < lignes; y++) {
+    // t = 0 pour la ligne du bas (basses), 1 pour la ligne du haut (aigus)
+    const t  = lignes > 1 ? (lignes - 1 - y) / (lignes - 1) : 0;
+    const t2 = lignes > 1 ? (lignes - y) / (lignes - 1) : 1;
+    const f1 = FREQUENCE_MIN * Math.pow(FREQUENCE_MAX / FREQUENCE_MIN, t);
+    const f2 = FREQUENCE_MIN * Math.pow(FREQUENCE_MAX / FREQUENCE_MIN, t2);
+    const debut = Math.min(nombreCases - 1, Math.floor(f1 / hzParCase));
+    const fin   = Math.min(nombreCases, Math.max(debut + 1, Math.ceil(f2 / hzParCase)));
+    plages.push({ debut: debut, fin: fin, t: t });
+    couleurs.push(teinteEnRgb(TEINTE_BASSES + (TEINTE_AIGUS - TEINTE_BASSES) * t));
+  }
+}
+
+// Met à jour le niveau de chaque ligne + niveauGraves et niveauAigus
 function mesurerSon() {
+  const actif = analyseur && sonEnCours();
+  if (actif) analyseur.getByteFrequencyData(frequences);
+
+  // 1. Volume brut de chaque ligne
+  const bruts = [];
+  let plusFort = 0;
+  for (let y = 0; y < lignes; y++) {
+    let brut = 0;
+    if (actif) {
+      const plage = plages[y];
+      // Les aigus sont naturellement plus faibles : on les remonte un peu
+      brut = moyenne(plage.debut, plage.fin) + plage.t * 0.1;
+    }
+    bruts.push(brut);
+    plusFort = Math.max(plusFort, brut);
+  }
+
+  // 2. Volume automatique : on compare chaque ligne au plus fort volume récent,
+  //    pour qu'un son calme fasse autant réagir le fond qu'un son fort
+  plafond = Math.max(0.2, plusFort, plafond * 0.995);
+
+  for (let y = 0; y < lignes; y++) {
+    const niveau = borner((bruts[y] / plafond - 0.2) / 0.8, 0, 1);
+    // Lissage : monte vite, redescend doucement
+    bandes[y] = niveau > bandes[y] ? niveau : bandes[y] * 0.88;
+  }
+
   let graves = 0;
   let aigus = 0;
-  if (analyseur && sonEnCours()) {
-    analyseur.getByteFrequencyData(frequences);
-    graves = moyenne(0, 8);      // ~0-1400 Hz : basses, kick
-    aigus  = moyenne(30, 90);    // ~5-15 kHz : hi-hats, souffle, grésillements
+  if (actif) {
+    graves = moyenne(1, 8);        // ~20-170 Hz : basses, kick
+    aigus  = moyenne(230, 700);    // ~5-15 kHz : hi-hats, souffle, grésillements
   }
   // Un "coup" = les basses dépassent leur niveau habituel.
   // Ainsi un son toujours fort ne garde pas le fond allumé en permanence.
   moyenneGraves = moyenneGraves * 0.95 + graves * 0.05;
   const coup = Math.min(1, Math.max(0, (graves - moyenneGraves) * 4));
 
-  // Lissage : monte vite, redescend doucement
   niveauGraves = coup  > niveauGraves ? coup  : niveauGraves * 0.85;
   niveauAigus  = aigus > niveauAigus  ? aigus : niveauAigus  * 0.8;
 }
@@ -370,6 +453,7 @@ function redimensionner() {
   lignes   = Math.ceil(window.innerHeight / HAUTEUR_CASE);
   lecture.width  = colonnes;
   lecture.height = lignes;
+  preparerSpectre();   // le nombre de lignes a changé
 }
 redimensionner();
 window.addEventListener("resize", redimensionner);
@@ -391,14 +475,22 @@ function lireVideo() {
   return ctxLecture.getImageData(0, 0, colonnes, lignes).data;   // [r, g, b, a, r, g, b, a, …]
 }
 
-function dessinerAscii() {
+// Garde un nombre entre min et max
+function borner(valeur, min, max) {
+  return Math.min(max, Math.max(min, valeur));
+}
+
+function dessinerAscii(instant) {
   const pixels = lireVideo();
   mesurerSon();
 
+  const temps = instant / 1000;   // en secondes, pour faire onduler les vagues
+  const deformation = animationsReduites ? 0 : REACTION_DEFORMATION;
   // Les coups de basse rendent tout plus lumineux
   const lumiere = LUMINOSITE * (1 + niveauGraves * REACTION_LUMIERE);
-  // Les aigus déclenchent des glitchs (désactivés si "réduire les animations")
+  // Les aigus brouillent des caractères (désactivé si "réduire les animations")
   const glitch = animationsReduites ? 0 : niveauAigus * REACTION_GLITCH;
+  const centre = colonnes / 2;
 
   ctx.fillStyle = "#020202";
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -406,17 +498,37 @@ function dessinerAscii() {
   ctx.textBaseline = "top";
 
   for (let y = 0; y < lignes; y++) {
-    // Glitch : certaines lignes glissent sur le côté (plus il y a d'aigus, plus c'est fréquent)
-    const decalage = Math.random() < glitch ? Math.round((Math.random() - 0.5) * glitch * 40) : 0;
+    const bande = bandes[y];            // volume de la plage de fréquences de cette ligne
+    const couleur = couleurs[y];        // sa couleur (chaude en bas, froide en haut)
+
+    // Déformation 1 : la ligne est étirée depuis le centre (zoom) selon son volume
+    const zoom = 1 + bande * 0.6 * deformation + niveauGraves * 0.15 * deformation;
+    // Déformation 2 : la ligne ondule de gauche à droite comme une vague
+    const vague = Math.sin(y * 0.35 + temps * 5) * bande * 8 * deformation;
+    // Longueur de la barre de spectre qui part de chaque bord
+    const barre = bande * LONGUEUR_BARRES * centre;
+    // Part de couleur du spectre dans les caractères de la ligne
+    const melange = Math.min(1, bande * 1.6 * REACTION_COULEUR);
 
     for (let x = 0; x < colonnes; x++) {
-      const xSource = Math.min(colonnes - 1, Math.max(0, x + decalage));
-      const i = (y * colonnes + xSource) * 4;
-      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+      // Déformation 3 : les coups de basse font "rebondir" les colonnes de haut en bas
+      const rebond = Math.sin(x * 0.18 - temps * 4) * niveauGraves * 3 * deformation;
+      const xSource = Math.round(borner(centre + (x - centre) / zoom + vague, 0, colonnes - 1));
+      const ySource = Math.round(borner(y + rebond, 0, lignes - 1));
+      const i = (ySource * colonnes + xSource) * 4;
+      let r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
 
       // Luminosité perçue, entre 0 (noir) et 1 (blanc)
       let lum = ((0.299 * r + 0.587 * g + 0.114 * b) / 255) * lumiere;
-      lum = Math.min(1, Math.max(0, (lum - 0.5) * CONTRASTE + 0.5));   // on accentue l'écart clair / sombre
+      lum = borner((lum - 0.5) * CONTRASTE + 0.5, 0, 1);   // on accentue l'écart clair / sombre
+
+      // Dans la barre de spectre (près des bords) : caractères plus denses, couleur pure
+      let part = melange;
+      if (Math.min(x, colonnes - 1 - x) < barre) {
+        lum = Math.max(lum, 0.3 + bande * 0.6);
+        part = 1;
+      }
+
       let caractere = CARACTERES[Math.floor(lum * (CARACTERES.length - 1))];
       if (caractere === " ") continue;   // case vide : rien à dessiner
 
@@ -425,9 +537,16 @@ function dessinerAscii() {
         caractere = CARACTERES[1 + Math.floor(Math.random() * (CARACTERES.length - 1))];
       }
 
-      ctx.fillStyle = EN_COULEUR
-        ? "rgb(" + Math.min(255, r * lumiere) + "," + Math.min(255, g * lumiere) + "," + Math.min(255, b * lumiere) + ")"
-        : "#bbbbbb";
+      if (EN_COULEUR) {
+        // Mélange entre la couleur de la vidéo et celle du spectre
+        const intensite = 0.35 + lum * 0.65;
+        r = r * lumiere * (1 - part) + couleur[0] * intensite * part;
+        g = g * lumiere * (1 - part) + couleur[1] * intensite * part;
+        b = b * lumiere * (1 - part) + couleur[2] * intensite * part;
+        ctx.fillStyle = "rgb(" + Math.min(255, r) + "," + Math.min(255, g) + "," + Math.min(255, b) + ")";
+      } else {
+        ctx.fillStyle = "#bbbbbb";
+      }
       ctx.fillText(caractere, x * LARGEUR_CASE, y * HAUTEUR_CASE);
     }
   }
@@ -447,7 +566,7 @@ function boucleAscii(instant) {
   if (instant - dernierDessin >= intervalle() && video.readyState >= 2) {   // 2 = une image est prête
     dernierDessin = instant;
     try {
-      dessinerAscii();
+      dessinerAscii(instant);
     } catch (erreur) {
       passerEnModeVideo(erreur);
       return;

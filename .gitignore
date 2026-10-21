@@ -1,0 +1,5 @@
+# Sauvegardes des sessions Claude Code (non versionnées)
+.claude-sessions/
+
+# Configuration locale de Claude Code
+.claude/

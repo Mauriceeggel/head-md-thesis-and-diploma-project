@@ -12,16 +12,24 @@ Joël s'interesse au rapport que l'on porte avec les images (en particulier l'im
 
 Par exemple: Soleil <i>Levant de Monet</i> → Historiquement on retient principalement l'influence ésthétique de cette peinture sur le monde de l'art, alors que cette dernière représente l'impacte de l'ère industriel sur l'environnement. 
 
-L'imagerie spatial créer une forme de distraction - nous ne questionnons plus les conditions de production l'image (prise de vue, montage, décision ésthétique)
+L'imagerie spatial créer une forme de distraction - nous ne questionnons plus les conditions de production l'image (prise de vue, montage, décision ésthétique) <br>
+
+Qui prend la photo ? pourquoi ? comment ? à quelles fins ? 
+
+Peut-on imaginer des possibilitées (points de vue) alternatives ??<br>
+OUI ! → L'afrofuturisme par exemple [Sun ra, Herbie Hancock, etc.]
 
 
 
 ## REF
 
 - [Whole Earth Catalog](https://wholeearth.info/)
+- [Lisa Messeri](https://www.lisamesseri.com/)
+- [Ways of Being](https://jamesbridle.com/books/ways-of-being)
 
 
-##
+
+<hr>
 
 # 𖨠 26.10.07 - Designing questions & reflections 𖨠 <br> (w/ Alexia Mathieu) 
 

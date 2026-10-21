@@ -1,0 +1,233 @@
+/* =========================================================
+   BLOC-NOTES — style de l'app Notes de macOS (sobre)
+   ========================================================= */
+
+:root {
+  --bg: #ffffff;
+  --sidebar: #f6f5f3;
+  --line: #e3e1dd;
+  --text: #1d1d1f;
+  --muted: #8a8a8e;
+  --accent: #e0a800;          /* jaune "Notes" */
+  --selected: #fbe7a4;        /* note sélectionnée dans la liste */
+  --link: #b07c00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Deux colonnes : liste à gauche, note à droite */
+.notes-app {
+  display: flex;
+  height: 100%;
+}
+
+/* ---------------------------------------------------------
+   Colonne de gauche
+   --------------------------------------------------------- */
+.notes-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: 260px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+.notes-folder {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.notes-folder h1 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.notes-folder p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.notes-list {
+  padding: 8px;
+}
+
+/* Un élément de la liste = titre + date + début du texte */
+.notes-item {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.notes-item + .notes-item {
+  margin-top: 2px;
+}
+
+.notes-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.notes-item.is-selected {
+  background: var(--selected);
+}
+
+.notes-item-title {
+  display: block;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notes-item-meta {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notes-item-meta b {
+  margin-right: 6px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------
+   Colonne de droite : la note
+   --------------------------------------------------------- */
+.notes-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.note {
+  display: none;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px 32px 60px;
+}
+
+.note.is-visible {
+  display: block;
+}
+
+.note-date {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.note h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.note-with {
+  margin: 2px 0 20px;
+  color: var(--muted);
+}
+
+.note h3 {
+  margin: 28px 0 6px;
+  font-size: 16px;
+}
+
+.note p {
+  margin: 0 0 12px;
+}
+
+.note ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.note li {
+  margin-bottom: 4px;
+}
+
+.note a {
+  color: var(--link);
+}
+
+.note img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 18px 0;
+  border-radius: 6px;
+}
+
+/* Bouton "retour à la liste" : seulement sur petit écran */
+.notes-back {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   Petit écran : une seule colonne à la fois
+   (la liste, puis la note quand on en choisit une)
+   --------------------------------------------------------- */
+@media (max-width: 640px) {
+  .notes-sidebar {
+    width: 100%;
+    border-right: none;
+  }
+
+  .notes-content {
+    display: none;
+  }
+
+  .notes-app.is-reading .notes-sidebar {
+    display: none;
+  }
+
+  .notes-app.is-reading .notes-content {
+    display: block;
+  }
+
+  .notes-back {
+    display: block;
+    margin: 10px 0 0 12px;
+    padding: 4px 6px;
+    border: none;
+    background: none;
+    color: var(--accent);
+    font: inherit;
+    font-size: 15px;
+  }
+
+  .note {
+    padding: 8px 20px 48px;
+  }
+}

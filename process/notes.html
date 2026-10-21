@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Process — Bloc-notes</title>
+
+  <!-- Version "bloc-notes" de process/readme.md, affichée dans la fenêtre
+       "process" de la page d'accueil. Le readme.md reste le texte de
+       référence : chaque entrée "# 𖨠 date - titre 𖨠" du markdown devient
+       une <article class="note"> ci-dessous. -->
+  <link rel="stylesheet" href="notes.css?v=1">
+</head>
+<body>
+
+  <div class="notes-app">
+
+    <!-- =========================================================
+         COLONNE DE GAUCHE : liste des notes
+         Elle est remplie automatiquement par notes.js à partir des
+         <article class="note"> (titre, date, début du texte).
+         ========================================================= -->
+    <aside class="notes-sidebar">
+      <header class="notes-folder">
+        <h1>𖥋 Process 𖥋</h1>
+        <p>This folder contains various notes, references, sketches, images, ideas, etc.
+          Each entry is dated and arranged in reverse chronological order.</p>
+      </header>
+      <nav class="notes-list" aria-label="Notes"></nav>
+    </aside>
+
+    <!-- =========================================================
+         COLONNE DE DROITE : les notes
+         Une seule est visible à la fois (celle choisie dans la liste).
+
+         POUR AJOUTER UNE NOTE : copier un bloc <article>…</article>,
+         le coller EN HAUT (ordre chronologique inversé), puis changer :
+         - id         : la date au format aa-mm-jj (sert d'adresse : notes.html#26-10-14)
+         - data-date  : la date affichée (26.10.14)
+         - data-title : le titre affiché dans la liste
+         - le contenu
+         ========================================================= -->
+    <main class="notes-content">
+
+      <button class="notes-back" type="button">‹ Notes</button>
+
+      <article class="note" id="26-10-14" data-date="26.10.14" data-title="Wendy Chun">
+        <p class="note-date">14 octobre 2026</p>
+        <h2>𖨠 26.10.14 - Wendy Chun 𖨠</h2>
+        <p class="note-with">(w/ Alexia Mathieu &amp; Joël Vacheron)</p>
+
+        <p><u><strong>Unseeing Space Imagery → Ways of seeing</strong></u></p>
+
+        <p>Joël s'interesse au rapport que l'on porte avec les images (en particulier l'imagerie spatial) - Pourquoi s'arrêter à l'aspect ésthétique des images et ne pas remettre en question la signification même de cette image.</p>
+
+        <p>Par exemple: Soleil <i>Levant de Monet</i> → Historiquement on retient principalement l'influence ésthétique de cette peinture sur le monde de l'art, alors que cette dernière représente l'impacte de l'ère industriel sur l'environnement.</p>
+
+        <p>L'imagerie spatial créer une forme de distraction - nous ne questionnons plus les conditions de production l'image (prise de vue, montage, décision ésthétique)</p>
+
+        <p>Qui prend la photo ? pourquoi ? comment ? à quelles fins ?</p>
+
+        <p>Peut-on imaginer des possibilitées (points de vue) alternatives ??<br>
+          OUI ! → L'afrofuturisme par exemple [Sun ra, Herbie Hancock, etc.]</p>
+
+        <h3>REF</h3>
+        <ul>
+          <li><a href="https://wholeearth.info/" target="_blank" rel="noopener">Whole Earth Catalog</a></li>
+          <li><a href="https://www.lisamesseri.com/" target="_blank" rel="noopener">Lisa Messeri</a></li>
+          <li><a href="https://jamesbridle.com/books/ways-of-being" target="_blank" rel="noopener">Ways of Being</a></li>
+        </ul>
+      </article>
+
+      <article class="note" id="26-10-07" data-date="26.10.07" data-title="Designing questions &amp; reflections">
+        <p class="note-date">7 octobre 2026</p>
+        <h2>𖨠 26.10.07 - Designing questions &amp; reflections 𖨠</h2>
+        <p class="note-with">(w/ Alexia Mathieu)</p>
+
+        <p>We worked on <a href="https://hessoit.sharepoint.com/:b:/r/sites/26-27MAMediaDesign/Documents%20partages/md1_%20designing%20questions/Presentations/Wed%2007.10/Designing%20questions_reflections.pdf?d=w09b4cac247b74776a8987bea3f06f15c&amp;csf=1&amp;web=1&amp;e=n6mMdg" target="_blank" rel="noopener">exercises</a> proposed by Alexia, focusing on the concepts of fascination, friction, and repetitiveness within our areas of interest.</p>
+
+        <img src="img/IMG_2598%20-%20Grande.jpeg" alt="map">
+
+        <p>→ For <u>October 26, 2026</u>, try to do exercise 5 from the PDF:</p>
+
+        <ul>
+          <li>I am interested in exploring ___.</li>
+          <li>The context, community, place, material or practice I want to engage with is ___.</li>
+          <li>I am curious about the relationship, contradiction or tension between ___ and ___.</li>
+          <li>I think this matters because ___.</li>
+          <li>I could investigate this by observing ___, speaking with ___, collecting or documenting ___, or making/prototyping ___.</li>
+          <li>This could help me understand ___.</li>
+          <li>My first small experiment could be ___</li>
+        </ul>
+      </article>
+
+    </main>
+
+  </div>
+
+  <script src="notes.js?v=1"></script>
+
+</body>
+</html>

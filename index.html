@@ -12,7 +12,7 @@
        Le README.md reste visible sur la page du repository GitHub. -->
   <!-- "?v=1" : numéro de version, à augmenter quand tu modifies style.css
        pour forcer les navigateurs à recharger la nouvelle version. -->
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
@@ -34,7 +34,11 @@
       <span class="folder-name">ᴘʀᴏᴄᴇꜱꜱ</span>
     </a>
 
-    <a class="folder" href="web-entities-reworked/">
+    <!-- data-window : ce dossier s'ouvre dans une fenêtre sur le bureau
+         (voir js/desktop.js) au lieu de quitter la page. La valeur est le
+         titre affiché dans la barre de la fenêtre. Sans cet attribut, le
+         dossier reste un simple lien. -->
+    <a class="folder" href="web-entities-reworked/" data-window="Web Entities">
       <svg class="folder-icon" viewBox="0 0 64 52" aria-hidden="true">
         <path class="folder-back" d="M2 6a4 4 0 0 1 4-4h16l6 6h30a4 4 0 0 1 4 4v34a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/>
         <path class="folder-front" d="M2 16a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v30a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/>
@@ -43,6 +47,10 @@
     </a>
 
   </main>
+
+  <!-- Gère l'ouverture des dossiers en fenêtres (déplacer, redimensionner,
+       agrandir, plein écran, réduire, fermer). -->
+  <script src="js/desktop.js?v=1"></script>
 
 </body>
 </html>

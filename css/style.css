@@ -329,3 +329,110 @@ body.is-dragging {
 .window.is-opening {
   animation: window-open 0.16s ease-out;
 }
+
+
+/* =========================================================
+   ÉCRAN DE DÉMARRAGE (voir js/boot.js)
+   ========================================================= */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;           /* au-dessus du bureau et des fenêtres */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: var(--bg);
+  /* la durée du fondu est réglée dans js/boot.js (FADE) */
+  transition-property: opacity;
+  transition-timing-function: ease-out;   /* le fondu se voit dès son début */
+}
+
+.boot.is-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Bouton d'allumage */
+.boot-power {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 1px solid #d0d0d0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2b2b2b;
+  cursor: var(--cursor);
+  transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.boot-power svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* Si le bouton contient une image PNG à la place du dessin SVG :
+   elle remplit le bouton, sans être déformée. */
+.boot-power img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.boot-power:hover,
+.boot-power:focus-visible {
+  border-color: #9a9a9a;
+  box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.04);
+  outline: none;
+}
+
+.boot-hint {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #9a9a9a;
+}
+
+/* Barre de progression : cachée tant qu'on n'a pas démarré */
+.boot-bar {
+  width: 180px;
+  height: 4px;
+  border-radius: 2px;
+  background: #e6e6e6;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.boot-progress {
+  width: 0%;
+  height: 100%;
+  background: #2b2b2b;
+}
+
+/* Une fois démarré : le bouton reste (comme un logo), sans contour,
+   le texte disparaît et la barre apparaît. */
+.boot.is-starting .boot-power {
+  border-color: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.boot.is-starting .boot-hint {
+  visibility: hidden;
+}
+
+.boot.is-starting .boot-bar {
+  visibility: visible;
+}
+
+.boot[hidden] {
+  display: none;
+}

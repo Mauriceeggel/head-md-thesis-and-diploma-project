@@ -12,9 +12,37 @@
        Le README.md reste visible sur la page du repository GitHub. -->
   <!-- "?v=1" : numéro de version, à augmenter quand tu modifies style.css
        pour forcer les navigateurs à recharger la nouvelle version. -->
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
+
+  <!-- =========================================================
+       ÉCRAN DE DÉMARRAGE
+       Recouvre le bureau à l'arrivée sur le site (voir js/boot.js).
+       1. On clique sur le bouton d'allumage : les navigateurs bloquent
+          le son tant que le visiteur n'a pas cliqué sur la page.
+       2. Le son de démarrage se joue et la barre se remplit au même
+          rythme.
+       3. À l'entrée du piano (FADE_START dans js/boot.js), l'écran
+          disparaît en fondu ; le son continue de jouer.
+
+       POUR UTILISER TA PROPRE IMAGE DE BOUTON : remplacer le <svg>…</svg>
+       ci-dessous par
+         <img src="img/boot-button.png" alt="">
+       (le PNG est automatiquement mis à la taille du bouton, voir
+       .boot-power dans css/style.css).
+       ========================================================= -->
+  <div class="boot" role="dialog" aria-label="Startup">
+    <button class="boot-power" type="button" aria-label="Start">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v9"/>
+        <path d="M6.3 6.8a8 8 0 1 0 11.4 0"/>
+      </svg>
+    </button>
+    <p class="boot-hint">click to start</p>
+    <div class="boot-bar" aria-hidden="true"><div class="boot-progress"></div></div>
+    <audio class="boot-sound" src="audio/startup-sound.mp3" preload="auto"></audio>
+  </div>
 
   <!-- =========================================================
        BUREAU
@@ -51,6 +79,9 @@
   <!-- Gère l'ouverture des dossiers en fenêtres (déplacer, redimensionner,
        agrandir, plein écran, réduire, fermer). -->
   <script src="js/desktop.js?v=1"></script>
+
+  <!-- Écran de démarrage + son -->
+  <script src="js/boot.js?v=5"></script>
 
 </body>
 </html>

@@ -45,6 +45,7 @@
   --separateur: 1px solid rgba(0, 0, 0, 0.2);   /* ligne entre deux messages */
   --cadre: 1px solid #ffffff;           /* fine ligne blanche autour de chaque fil */
   --largeur-colonne: 600px;             /* largeur de la colonne du forum */
+  --curseur: image-set(url("../img/cursor-01-small.png") 1x, url("../img/cursor-01.png") 2x) 1 1, default;   /* curseur de la souris (le même que sur la page d'accueil) */
 }
 
 
@@ -67,6 +68,7 @@ body {
   font-weight: normal;
   line-height: 1.4;
   overflow-x: hidden;
+  cursor: var(--curseur);
 }
 
 img {

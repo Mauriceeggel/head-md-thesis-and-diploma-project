@@ -9,6 +9,14 @@
   --folder-back: #7fb0e6;   /* dos + onglet du dossier */
   --folder-front: #a9cdf5;  /* face avant du dossier */
   --select: #2a6fdb;        /* surlignage au survol / à la sélection */
+
+  /* Curseur de la souris, à la taille d'un curseur normal (16 px) :
+     - cursor-01-small.png (16×16) pour les écrans classiques,
+     - cursor-01.png (32×32) pour les écrans Retina, affiché à 16 px
+       aussi mais plus net ;
+     puis le point qui "clique" (la pointe de la flèche, à 1 px du bord
+     haut-gauche) et le curseur de secours si l'image ne charge pas. */
+  --cursor: image-set(url("../img/cursor-01-small.png") 1x, url("../img/cursor-01.png") 2x) 1 1, default;
 }
 
 * {
@@ -26,6 +34,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 13px;
+  cursor: var(--cursor);
 }
 
 /* ---------------------------------------------------------
@@ -55,7 +64,7 @@ body {
   border-radius: 6px;
   color: inherit;
   text-decoration: none;
-  cursor: default;
+  cursor: var(--cursor);
 }
 
 .folder-icon {
@@ -163,7 +172,7 @@ body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: none; /* glisser au doigt sans faire défiler la page */
-  cursor: default;
+  cursor: var(--cursor);
 }
 
 .window-title {
@@ -197,7 +206,7 @@ body {
   padding: 0;
   border-radius: 50%;
   border: 0.5px solid rgba(0, 0, 0, 0.15);
-  cursor: default;
+  cursor: var(--cursor);
 }
 
 .light-close    { background: #ff5f57; }
@@ -251,7 +260,7 @@ body {
   color: #6b6b6b;
   font-size: 13px;
   text-decoration: none;
-  cursor: default;
+  cursor: var(--cursor);
 }
 
 .window-tool:hover {

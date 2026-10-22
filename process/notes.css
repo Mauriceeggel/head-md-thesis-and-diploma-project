@@ -11,6 +11,9 @@
   --accent: #e0a800;          /* jaune "Notes" */
   --selected: #fbe7a4;        /* note sélectionnée dans la liste */
   --link: #b07c00;
+
+  /* Curseur de la souris (le même que sur la page d'accueil) */
+  --cursor: image-set(url("../img/cursor-01-small.png") 1x, url("../img/cursor-01.png") 2x) 1 1, default;
 }
 
 * {
@@ -29,6 +32,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.55;
+  cursor: var(--cursor);
 }
 
 /* Deux colonnes : liste à gauche, note à droite */
@@ -83,7 +87,7 @@ body {
   color: inherit;
   font: inherit;
   text-align: left;
-  cursor: default;
+  cursor: var(--cursor);
 }
 
 .notes-item + .notes-item {

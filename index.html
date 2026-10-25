@@ -12,7 +12,7 @@
        Le README.md reste visible sur la page du repository GitHub. -->
   <!-- "?v=1" : numéro de version, à augmenter quand tu modifies style.css
        pour forcer les navigateurs à recharger la nouvelle version. -->
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -26,14 +26,12 @@
        3. À l'entrée du piano (FADE_START dans js/boot.js), l'écran
           disparaît en fondu ; le son continue de jouer.
 
-       POUR UTILISER TA PROPRE IMAGE DE BOUTON : remplacer le <svg>…</svg>
-       ci-dessous par
-         <img src="img/boot-button.png" alt="">
-       (le PNG est automatiquement mis à la taille du bouton, voir
-       .boot-power dans css/style.css).
+       LE BOUTON EST LE LOGO 3D (img/kgm-logo-3d.glb), affiché et animé
+       par js/boot-logo.js avec une matière métallique. Le dessin <svg>
+       ci-dessous ne s'affiche que si la 3D ne peut pas se charger.
        ========================================================= -->
   <div class="boot" role="dialog" aria-label="Startup">
-    <button class="boot-power" type="button" aria-label="Start">
+    <button class="boot-power boot-power--3d" type="button" aria-label="Start">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 3v9"/>
         <path d="M6.3 6.8a8 8 0 1 0 11.4 0"/>
@@ -41,7 +39,7 @@
     </button>
     <p class="boot-hint">click to start</p>
     <div class="boot-bar" aria-hidden="true"><div class="boot-progress"></div></div>
-    <audio class="boot-sound" src="audio/startup-sound.mp3" preload="auto"></audio>
+    <audio class="boot-sound" src="audio/start-sound.mp3" preload="auto"></audio>
   </div>
 
   <!-- =========================================================
@@ -81,7 +79,19 @@
   <script src="js/desktop.js?v=1"></script>
 
   <!-- Écran de démarrage + son -->
-  <script src="js/boot.js?v=5"></script>
+  <script src="js/boot.js?v=6"></script>
+
+  <!-- Logo 3D du bouton de démarrage. three.js (bibliothèque 3D) est
+       chargé depuis un CDN : l'importmap indique où trouver ses fichiers. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="js/boot-logo.js?v=1"></script>
 
 </body>
 </html>

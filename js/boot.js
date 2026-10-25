@@ -8,8 +8,8 @@
 (function () {
 
   // Moment du son (en secondes) où le fondu commence : l'entrée du piano.
-  // Le son dure 4,9 s ; la barre est pleine à ce moment-là.
-  const FADE_START = 2.2;
+  // Le son (audio/start-sound.mp3) dure 4,4 s ; la barre est pleine à ce moment-là.
+  const FADE_START = 1.8;
 
   // Durée du fondu, en secondes. Le son continue de jouer après.
   const FADE = 1.2;

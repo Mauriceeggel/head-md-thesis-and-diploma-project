@@ -401,6 +401,29 @@ body.is-dragging {
   color: #9a9a9a;
 }
 
+/* Bouton = logo 3D (voir js/boot-logo.js) : plus grand, sans cercle.
+   Le dessin SVG reste au centre tant que la 3D n'est pas prête. */
+.boot-power--3d,
+.boot-power--3d:hover,
+.boot-power--3d:focus-visible {
+  width: 180px;
+  height: 180px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.boot-power--3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.boot-power.has-3d svg {
+  display: none;
+}
+
 /* Barre de progression : cachée tant qu'on n'a pas démarré */
 .boot-bar {
   width: 180px;

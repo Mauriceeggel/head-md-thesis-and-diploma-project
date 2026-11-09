@@ -16,9 +16,9 @@ Each entry is dated and arranged in reverse chronological order.
 
 <u>**Exercice - october 26**</u>
 
-- I am interested in exploring **Sound / Music in the digital space**. 
-- The context, community, place, material or practice I want to engage with is **Music Production / Sound Design comunnity**. 
-- I am curious about the relationship, contradiction or tension between **narration | visual** and **sound**. 
+- I am interested in exploring **Sound / Music produce with machine (in the broad sense of the term)**. 
+- The context, community, place, material or practice I want to engage with is **Music Production / Sound Design / Machines / Low Tech**. 
+- I am curious about the relationship, contradiction or tension between **The Machine** and **Sound**. 
 - I think this matters because **Sound is an aspect often considered secondary within digital spaces**. 
 - I could investigate this by observing **artists - plugins - video games**, speaking with people **who produce sound on a computer**, collecting or documenting **the various facets of using sound within digital spaces**, or making/prototyping **a VST ? a website ?**. 
 - This could help me understand **the importance of sound within digital spaces – why use sound in a space that does not inherently require it?**. 
@@ -30,10 +30,10 @@ Each entry is dated and arranged in reverse chronological order.
 
 **4 Key references:**
 
-- 
--
--
--
+- [Iglooghost](https://iglooghost.net/)
+- [Sisters with Transistors](https://sisterswithtransistors.com/)
+- [VIBES LORE CORE](https://audimat-editions.fr/catalogue/valentina-tanni-vibes-lore-core)
+- [Richon-Bender](https://richon-bender.ch/fr/installations)
 
 **Map your subject**
 

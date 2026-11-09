@@ -4,6 +4,45 @@
 Each entry is dated and arranged in reverse chronological order. 
 <hr>
 
+# 𖨠 26.11.04 -  André Ourednik 𖨠 <br> 
+
+[<u>**Alterated Realities and Real Alternatives**</u>](https://ourednik.info/events.php?event=head2026-art-emotions-ai-1)
+
+
+![note](/process/img/01.jpeg)
+![note](/process/img/02.jpeg)
+
+<hr>
+
+<u>**Exercice - october 26**</u>
+
+- I am interested in exploring **Sound / Music in the digital space**. 
+- The context, community, place, material or practice I want to engage with is **Music Production / Sound Design comunnity**. 
+- I am curious about the relationship, contradiction or tension between **narration | visual** and **sound**. 
+- I think this matters because **Sound is an aspect often considered secondary within digital spaces**. 
+- I could investigate this by observing **artists - plugins - video games**, speaking with people **who produce sound on a computer**, collecting or documenting **the various facets of using sound within digital spaces**, or making/prototyping **a VST ? a website ?**. 
+- This could help me understand **the importance of sound within digital spaces – why use sound in a space that does not inherently require it?**. 
+- My first small experiment could be **A fictional forum centered on sound**
+
+<hr>
+
+<u>**Assignment - november 11**</u>
+
+**4 Key references:**
+
+- 
+-
+-
+-
+
+**Map your subject**
+
+
+
+**Angle of approach**
+
+
+
 # 𖨠 26.10.14 - Wendy Chun 𖨠 <br> (w/ Alexia Mathieu & Joël Vacheron) 
 
 <u>**Unseeing Space Imagery → Ways of seeing**</u>

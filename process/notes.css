@@ -193,6 +193,13 @@ body {
   border-radius: 6px;
 }
 
+/* Ligne de séparation entre les parties d'une note */
+.note hr {
+  margin: 24px 0;
+  border: none;
+  border-top: 1px solid var(--line);
+}
+
 /* Bouton "retour à la liste" : seulement sur petit écran */
 .notes-back {
   display: none;

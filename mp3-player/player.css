@@ -1,0 +1,539 @@
+/* =========================================================
+   LECTEUR MP3 — style lecteur Windows des années 2000
+   Tout est dessiné pour une largeur de 550 px, puis agrandi
+   ou réduit pour remplir la fenêtre (voir fit() dans player.js).
+   ========================================================= */
+
+:root {
+  --panel-top: #3b3b5e;
+  --panel-bottom: #1f1f36;
+  --edge-light: #6a6a92;
+  --edge-dark: #0c0c18;
+  --lcd: #000000;
+  --green: #1cff3c;
+  --green-dim: #0f5a18;
+  --gold-light: #f1e2a8;
+  --gold-dark: #8a7640;
+  --button: #c6c9d4;
+  --button-light: #f2f3f7;
+  --button-dark: #6f7284;
+  --label: #cfd0e0;
+
+  --cursor: image-set(url("../img/cursor-01-small.png") 1x, url("../img/cursor-01.png") 2x) 1 1, default;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: #15152a;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: var(--cursor);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button,
+input {
+  cursor: var(--cursor);
+}
+
+/* Tout le lecteur (zoomé par player.js) */
+.app {
+  width: 550px;
+  flex: none;
+}
+
+/* Lecteur SoundCloud caché (il doit rester "affiché" pour jouer) */
+.soundcloud {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 300px;
+  height: 120px;
+  border: 0;
+}
+
+
+/* ---------------------------------------------------------
+   Le boîtier
+   --------------------------------------------------------- */
+.player {
+  display: flex;
+  flex-direction: column;
+  height: 232px;
+  padding: 0 10px 10px;
+  background: linear-gradient(var(--panel-top), var(--panel-bottom));
+  border: 1px solid var(--edge-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--edge-light),
+    inset -1px -1px 0 #14142a;
+}
+
+/* Creux (écrans, barre d'avancement) */
+.lcd,
+.marquee,
+.lcd-box,
+.seek,
+.playlist {
+  border: 1px solid;
+  border-color: var(--edge-dark) var(--edge-light) var(--edge-light) var(--edge-dark);
+}
+
+
+/* ---------------------------------------------------------
+   Barre de titre
+   --------------------------------------------------------- */
+.player-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 24px;
+  flex: none;
+}
+
+.player-title-stripes {
+  flex: 1;
+  height: 9px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--gold-light) 0 1px,
+    var(--gold-dark) 1px 2px,
+    #5a4d27 2px 3px
+  );
+  box-shadow: 0 0 0 1px #2a2414;
+}
+
+.player-title-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #e9e9f4;
+  text-shadow: 1px 1px 0 #0a0a14;
+}
+
+
+/* ---------------------------------------------------------
+   Partie haute : écran + infos
+   --------------------------------------------------------- */
+.player-main {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  height: 96px;
+  flex: none;
+}
+
+/* Écran de gauche, avec une fine grille de points */
+.lcd {
+  position: relative;
+  flex: none;
+  width: 190px;
+  background-color: var(--lcd);
+  background-image: radial-gradient(#13241a 0.8px, transparent 0.9px);
+  background-size: 4px 4px;
+}
+
+/* ▶ / ❚❚ / ■ en haut à gauche */
+.lcd-state {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.lcd-state.is-playing {
+  background: var(--green);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.lcd-state.is-paused {
+  background: linear-gradient(to right, var(--green) 0 35%, transparent 35% 65%, var(--green) 65%);
+  animation: blink 1s steps(1) infinite;
+}
+
+.lcd-state.is-stopped {
+  background: var(--green);
+  transform: scale(0.85);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.lcd-time {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: "VT323", monospace;
+  font-size: 58px;
+  line-height: 1;
+  color: var(--green);
+  text-shadow: 0 0 6px rgba(28, 255, 60, 0.45);
+}
+
+.lcd-time.is-remaining::before {
+  content: "-";
+}
+
+/* Spectre (dessiné en gros pixels) */
+.lcd-spectrum {
+  position: absolute;
+  left: 14px;
+  bottom: 8px;
+  width: 152px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.player-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Titre qui défile */
+.marquee {
+  height: 28px;
+  overflow: hidden;
+  background: var(--lcd);
+  white-space: nowrap;
+}
+
+.marquee-text {
+  display: inline-block;
+  padding: 0 10px;
+  font-family: "VT323", monospace;
+  font-size: 24px;
+  line-height: 26px;
+  color: var(--green);
+  text-shadow: 0 0 5px rgba(28, 255, 60, 0.4);
+}
+
+.marquee.is-scrolling .marquee-text {
+  animation: marquee var(--duration, 12s) linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--label);
+}
+
+.lcd-box {
+  min-width: 34px;
+  padding: 0 4px;
+  background: var(--lcd);
+  font-family: "VT323", monospace;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: right;
+  color: var(--green);
+}
+
+.info-label {
+  margin-right: 10px;
+}
+
+.info-mode {
+  color: #6c6d88;
+}
+
+.info-mode:first-of-type {
+  margin-left: auto;
+}
+
+.info-mode.is-on {
+  color: var(--green);
+  text-shadow: 0 0 5px rgba(28, 255, 60, 0.6);
+}
+
+.player-sliders {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* ---------------------------------------------------------
+   Curseurs (volume, balance, avancement)
+   --------------------------------------------------------- */
+.slider,
+.seek {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.slider {
+  height: 16px;
+}
+
+.slider-volume  { width: 150px; }
+.slider-balance { width: 84px; }
+
+/* Rail du volume (orange) et de la balance (vert) */
+.slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  border: 1px solid #0c0c18;
+}
+
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  border: 1px solid #0c0c18;
+}
+
+.slider-volume::-webkit-slider-runnable-track { background: linear-gradient(#f4a65a, #b65a1c); }
+.slider-volume::-moz-range-track              { background: linear-gradient(#f4a65a, #b65a1c); }
+.slider-balance::-webkit-slider-runnable-track { background: linear-gradient(#7fe07a, #2c8a2a); }
+.slider-balance::-moz-range-track              { background: linear-gradient(#7fe07a, #2c8a2a); }
+
+/* Poignée grise avec trois traits */
+.slider::-webkit-slider-thumb {
+  width: 28px;
+  height: 16px;
+  margin-top: -5px;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid #15151f;
+  border-radius: 2px;
+  background:
+    linear-gradient(to right, transparent 9px, #4c4e5e 9px 10px, transparent 10px 13px, #4c4e5e 13px 14px, transparent 14px 17px, #4c4e5e 17px 18px, transparent 18px) center / 100% 8px no-repeat,
+    linear-gradient(var(--button-light), var(--button) 50%, var(--button-dark));
+}
+
+.slider::-moz-range-thumb {
+  width: 28px;
+  height: 16px;
+  border: 1px solid #15151f;
+  border-radius: 2px;
+  background:
+    linear-gradient(to right, transparent 9px, #4c4e5e 9px 10px, transparent 10px 13px, #4c4e5e 13px 14px, transparent 14px 17px, #4c4e5e 17px 18px, transparent 18px) center / 100% 8px no-repeat,
+    linear-gradient(var(--button-light), var(--button) 50%, var(--button-dark));
+}
+
+/* Barre d'avancement : un long creux et une poignée dorée */
+.seek {
+  flex: none;
+  width: 100%;
+  height: 22px;
+  margin-top: 10px;
+  background: #11112a;
+}
+
+.seek::-webkit-slider-runnable-track {
+  height: 20px;
+}
+
+.seek::-moz-range-track {
+  height: 20px;
+  background: transparent;
+}
+
+.seek::-webkit-slider-thumb {
+  width: 64px;
+  height: 18px;
+  margin-top: 1px;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid #3a3014;
+  border-radius: 2px;
+  background:
+    linear-gradient(transparent 5px, #8a7640 5px 6px, transparent 6px 11px, #8a7640 11px 12px, transparent 12px) center / 80% 100% no-repeat,
+    linear-gradient(#fbf1c8, #d8c27c 50%, #9c8546);
+}
+
+.seek::-moz-range-thumb {
+  width: 64px;
+  height: 18px;
+  border: 1px solid #3a3014;
+  border-radius: 2px;
+  background:
+    linear-gradient(transparent 5px, #8a7640 5px 6px, transparent 6px 11px, #8a7640 11px 12px, transparent 12px) center / 80% 100% no-repeat,
+    linear-gradient(#fbf1c8, #d8c27c 50%, #9c8546);
+}
+
+/* Pas de morceau chargé : poignée cachée */
+.seek:disabled::-webkit-slider-thumb { visibility: hidden; }
+.seek:disabled::-moz-range-thumb     { visibility: hidden; }
+
+
+/* ---------------------------------------------------------
+   Boutons
+   --------------------------------------------------------- */
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.btn,
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid;
+  border-color: var(--button-light) var(--button-dark) var(--button-dark) var(--button-light);
+  outline: 1px solid #10101c;
+  background: linear-gradient(#dfe1e8, var(--button));
+  color: #2c2d40;
+}
+
+.btn:active,
+.toggle:active {
+  border-color: var(--button-dark) var(--button-light) var(--button-light) var(--button-dark);
+  background: linear-gradient(var(--button), #dfe1e8);
+}
+
+.btn {
+  width: 46px;
+  height: 36px;
+}
+
+.btn svg {
+  width: 20px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.btn-eject {
+  margin-left: 8px;
+}
+
+/* Boutons à voyant (EQ, PL, SHUFFLE, répéter) */
+.toggle {
+  gap: 5px;
+  height: 22px;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.toggle i {
+  width: 6px;
+  height: 6px;
+  background: #1d4a22;
+  box-shadow: inset 0 0 0 1px #0c2410;
+}
+
+.toggle.is-on i {
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+}
+
+.toggle-shuffle {
+  height: 26px;
+  margin-left: 18px;
+  font-size: 12px;
+}
+
+.toggle-repeat {
+  height: 26px;
+}
+
+.toggle-repeat svg {
+  width: 20px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.player-logo {
+  height: 36px;
+  margin-left: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  -webkit-user-drag: none;
+}
+
+
+/* ---------------------------------------------------------
+   Liste des morceaux (bouton PL)
+   --------------------------------------------------------- */
+.playlist {
+  height: 200px;
+  margin: 0;
+  overflow-y: auto;
+  background: var(--lcd);
+  border-width: 0 1px 1px;
+  scrollbar-width: thin;
+  scrollbar-color: #3f4060 #000000;
+}
+
+.playlist[hidden] {
+  display: none;
+}
+
+.playlist-tracks {
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  counter-reset: track;
+}
+
+.playlist-tracks li {
+  display: flex;
+  gap: 8px;
+  padding: 0 10px;
+  font-family: "VT323", monospace;
+  font-size: 19px;
+  line-height: 22px;
+  color: var(--green);
+  white-space: nowrap;
+  counter-increment: track;
+}
+
+.playlist-tracks li::before {
+  content: counter(track) ".";
+}
+
+.playlist-tracks li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-tracks li:hover {
+  background: #0f0f30;
+}
+
+/* Morceau en cours : texte blanc sur fond bleu */
+.playlist-tracks li.is-current {
+  background: #0000b8;
+  color: #ffffff;
+}

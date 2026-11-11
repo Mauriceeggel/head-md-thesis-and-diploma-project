@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KeyGen Muzik — lecteur MP3</title>
+
+  <!-- Lecteur MP3 dans le style des vieux lecteurs Windows (années 2000).
+       Il s'ouvre dans une fenêtre du bureau (voir data-window dans
+       ../index.html) et lit la playlist SoundCloud KeyGen Muzik.
+
+       Le vrai lecteur SoundCloud est caché en bas de la page : on le
+       pilote avec l'API "Widget" de SoundCloud (player.js), et toute
+       l'interface visible est la nôtre. -->
+
+  <!-- Police "écran LCD" pour le temps et le titre qui défile -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+
+  <link rel="stylesheet" href="player.css?v=1">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- =========================================================
+         LECTEUR
+         ========================================================= -->
+    <section class="player" aria-label="Lecteur MP3">
+
+      <!-- Barre de titre : rayures dorées + nom -->
+      <header class="player-title">
+        <span class="player-title-stripes"></span>
+        <span class="player-title-text">KEYGEN MUZIK</span>
+        <span class="player-title-stripes"></span>
+      </header>
+
+      <div class="player-main">
+
+        <!-- Écran de gauche : état, temps, spectre -->
+        <div class="lcd">
+          <span class="lcd-state" aria-hidden="true"></span>
+          <!-- Clic sur le temps : temps écoulé / temps restant -->
+          <button class="lcd-time" type="button" title="Temps écoulé / restant">00:00</button>
+          <canvas class="lcd-spectrum" width="76" height="16" aria-hidden="true"></canvas>
+        </div>
+
+        <div class="player-right">
+
+          <!-- Titre du morceau, qui défile s'il est trop long -->
+          <div class="marquee"><span class="marquee-text">KEYGEN MUZIK</span></div>
+
+          <!-- Infos (décoratives, comme sur les vrais lecteurs) -->
+          <div class="player-info">
+            <span class="lcd-box">128</span><span class="info-label">kbps</span>
+            <span class="lcd-box">44</span><span class="info-label">kHz</span>
+            <span class="info-mode">mono</span>
+            <span class="info-mode is-on">stereo</span>
+          </div>
+
+          <!-- Volume, balance, égaliseur, liste des morceaux -->
+          <div class="player-sliders">
+            <input class="slider slider-volume" type="range" min="0" max="100" value="80" aria-label="Volume">
+            <input class="slider slider-balance" type="range" min="-100" max="100" value="0" aria-label="Balance">
+            <button class="toggle toggle-eq" type="button" aria-pressed="false"><i></i>EQ</button>
+            <button class="toggle toggle-pl" type="button" aria-pressed="false" title="Liste des morceaux"><i></i>PL</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Barre d'avancement (cliquer / glisser pour se déplacer dans le morceau) -->
+      <input class="seek" type="range" min="0" max="1000" value="0" aria-label="Position dans le morceau">
+
+      <!-- Boutons -->
+      <div class="player-controls">
+        <button class="btn btn-prev" type="button" aria-label="Précédent">
+          <svg viewBox="0 0 20 16"><path d="M4 2v12M16 2v12L6 8z"/></svg>
+        </button>
+        <button class="btn btn-play" type="button" aria-label="Lecture">
+          <svg viewBox="0 0 20 16"><path d="M6 2v12l9-6z"/></svg>
+        </button>
+        <button class="btn btn-pause" type="button" aria-label="Pause">
+          <svg viewBox="0 0 20 16"><path d="M6 2v12M13 2v12"/></svg>
+        </button>
+        <button class="btn btn-stop" type="button" aria-label="Stop">
+          <svg viewBox="0 0 20 16"><path d="M5 2h10v12H5z"/></svg>
+        </button>
+        <button class="btn btn-next" type="button" aria-label="Suivant">
+          <svg viewBox="0 0 20 16"><path d="M16 2v12M4 2v12l10-6z"/></svg>
+        </button>
+        <!-- Éjecter : ouvre la playlist sur SoundCloud -->
+        <button class="btn btn-eject" type="button" aria-label="Ouvrir la playlist sur SoundCloud" title="Ouvrir la playlist sur SoundCloud">
+          <svg viewBox="0 0 20 16"><path d="M3 10 10 3l7 7zM3 13h14"/></svg>
+        </button>
+
+        <button class="toggle toggle-shuffle is-on" type="button" aria-pressed="true"><i></i>SHUFFLE</button>
+        <button class="toggle toggle-repeat is-on" type="button" aria-pressed="true" aria-label="Répéter la playlist" title="Répéter la playlist">
+          <i></i><svg viewBox="0 0 20 12"><path d="M6 3h9v6H5M8 7l-3 2 3 2"/></svg>
+        </button>
+
+        <img class="player-logo" src="../img/mp3-icon-10.png" alt="">
+      </div>
+    </section>
+
+    <!-- =========================================================
+         LISTE DES MORCEAUX (bouton PL)
+         ========================================================= -->
+    <section class="playlist" aria-label="Liste des morceaux" hidden>
+      <ol class="playlist-tracks"></ol>
+    </section>
+
+  </div>
+
+  <!-- Le vrai lecteur SoundCloud, invisible.
+       Pour changer de playlist : remplacer l'adresse après "url=". -->
+  <iframe class="soundcloud" title="SoundCloud" allow="autoplay; encrypted-media"
+    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2327623170%3Fsecret_token%3Ds-yXMeuP13wrF&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false"></iframe>
+
+  <!-- API de SoundCloud pour piloter le lecteur caché -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+  <script src="player.js?v=1"></script>
+
+</body>
+</html>

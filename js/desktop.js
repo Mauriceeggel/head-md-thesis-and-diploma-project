@@ -28,37 +28,162 @@
   /* ---------------------------------------------------------
      Clic sur un dossier
      --------------------------------------------------------- */
-  document.querySelectorAll(".folder[data-window]").forEach(function (folder) {
+  document.querySelectorAll(".folder").forEach(function (folder) {
     folder.addEventListener("click", function (event) {
+      // Clic à la fin d'un déplacement de l'icône : on n'ouvre rien
+      if (folder.dataset.justMoved) {
+        event.preventDefault();
+        return;
+      }
+      if (!folder.hasAttribute("data-window")) return;
       // Cmd/Ctrl + clic : on garde le comportement normal du lien
       if (event.metaKey || event.ctrlKey || event.shiftKey) return;
       event.preventDefault();
-      openWindow(folder.getAttribute("href"), folder.dataset.window);
+      openWindow(folder.getAttribute("href"), folder.dataset.window, {
+        width: Number(folder.dataset.width) || 0,
+        height: Number(folder.dataset.height) || 0
+      });
     });
   });
 
 
   /* ---------------------------------------------------------
-     Demande venant d'une fenêtre : ouvrir une image en grand
-     (envoyée par process/notes.js quand on clique sur une image)
+     Messages venant des pages ouvertes dans les fenêtres
+     - "open-image" : ouvrir une image en grand
+       (process/notes.js, clic sur une image)
+     - "window-fit" : ajuster la hauteur de la fenêtre
+       (mp3-player/player.js, bouton PL)
      --------------------------------------------------------- */
   window.addEventListener("message", function (event) {
     const data = event.data;
-    if (!data || data.type !== "open-image" || typeof data.url !== "string") return;
+    if (!data || typeof data.type !== "string") return;
 
     // On n'accepte que les messages venant de nos propres fenêtres
-    const fromOurWindow = Array.from(windows.values()).some(function (win) {
+    const source = Array.from(windows.values()).find(function (win) {
       const frame = win.querySelector("iframe");
       return frame && frame.contentWindow === event.source;
     });
-    if (!fromOurWindow) return;
+    if (!source) return;
 
-    openWindow(data.url, data.title || "Image", {
-      image: true,
-      width: data.width,
-      height: data.height
-    });
+    if (data.type === "open-image" && typeof data.url === "string") {
+      openWindow(data.url, data.title || "Image", {
+        image: true,
+        width: data.width,
+        height: data.height
+      });
+    }
+
+    if (data.type === "window-fit" && data.height > 0) {
+      const bar = source.querySelector(".window-bar").offsetHeight;
+      const borders = source.offsetHeight - source.clientHeight;
+      const height = Math.min(window.innerHeight, Math.round(data.height) + bar + borders);
+      source.style.height = height + "px";
+      // La fenêtre ne doit pas dépasser du bas de l'écran
+      if (source.offsetTop + height > window.innerHeight) {
+        source.style.top = Math.max(0, window.innerHeight - height) + "px";
+      }
+    }
   });
+
+
+  /* ---------------------------------------------------------
+     Icônes du bureau déplaçables
+     On les glisse comme sur un vrai bureau ; leur place est
+     retenue par le navigateur (pour ce visiteur seulement).
+     Un simple clic (sans glisser) ouvre toujours l'app.
+     --------------------------------------------------------- */
+  const desktop = document.querySelector(".desktop");
+  const ICONS_KEY = "desktop-icons";
+  const MOVE_THRESHOLD = 4; // px avant de considérer que c'est un glisser
+
+  function loadIconPositions() {
+    try {
+      return JSON.parse(localStorage.getItem(ICONS_KEY)) || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveIconPositions() {
+    const positions = {};
+    desktop.querySelectorAll(".folder").forEach(function (folder) {
+      positions[folder.getAttribute("href")] = {
+        left: folder.offsetLeft,
+        top: folder.offsetTop
+      };
+    });
+    try {
+      localStorage.setItem(ICONS_KEY, JSON.stringify(positions));
+    } catch (error) {
+      // stockage indisponible (navigation privée…) : tant pis
+    }
+  }
+
+  // Garde l'icône entièrement visible sur le bureau
+  function placeIcon(folder, left, top) {
+    const maxLeft = Math.max(0, desktop.clientWidth - folder.offsetWidth);
+    const maxTop = Math.max(0, desktop.clientHeight - folder.offsetHeight);
+    folder.style.left = Math.min(maxLeft, Math.max(0, left)) + "px";
+    folder.style.top = Math.min(maxTop, Math.max(0, top)) + "px";
+  }
+
+  // Au départ, les icônes sont rangées en colonne par le CSS.
+  // On note cette place, puis on passe en placement libre.
+  (function setupDesktopIcons() {
+    const folders = Array.from(desktop.querySelectorAll(".folder"));
+    const saved = loadIconPositions();
+    const initial = folders.map(function (folder) {
+      return { left: folder.offsetLeft, top: folder.offsetTop };
+    });
+
+    desktop.classList.add("is-free");
+
+    folders.forEach(function (folder, index) {
+      const position = saved[folder.getAttribute("href")] || initial[index];
+      placeIcon(folder, position.left, position.top);
+
+      folder.draggable = false; // pas de "glisser-déposer" natif du lien
+      folder.addEventListener("pointerdown", function (event) {
+        startIconDrag(event, folder);
+      });
+    });
+
+    window.addEventListener("resize", function () {
+      folders.forEach(function (folder) {
+        placeIcon(folder, folder.offsetLeft, folder.offsetTop);
+      });
+    });
+  })();
+
+  function startIconDrag(event, folder) {
+    if (event.button !== 0) return;
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startLeft = folder.offsetLeft;
+    const startTop = folder.offsetTop;
+    let moved = false;
+
+    track(event, function (e) {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!moved && Math.hypot(dx, dy) < MOVE_THRESHOLD) return;
+      if (!moved) {
+        moved = true;
+        folder.classList.add("is-moving");
+      }
+      placeIcon(folder, startLeft + dx, startTop + dy);
+    }, function () {
+      folder.classList.remove("is-moving");
+      if (!moved) return;
+      saveIconPositions();
+      // Le "click" qui suit le relâchement ne doit pas ouvrir l'app
+      folder.dataset.justMoved = "1";
+      setTimeout(function () {
+        delete folder.dataset.justMoved;
+      });
+    });
+  }
 
 
   /* ---------------------------------------------------------
@@ -147,6 +272,14 @@
       }
     } else {
       win.querySelector(".window-content").src = url;
+
+      // Taille demandée par le dossier (data-width / data-height) :
+      // c'est la taille du contenu, on ajoute la barre de titre.
+      if (options.width > 0 && options.height > 0) {
+        const BAR = 36;
+        w = Math.min(window.innerWidth, options.width + 2);
+        h = Math.min(window.innerHeight, options.height + BAR + 2);
+      }
     }
 
     // Position de départ : centrée
@@ -465,7 +598,7 @@
   /* ---------------------------------------------------------
      Suivre la souris / le doigt jusqu'au relâchement
      --------------------------------------------------------- */
-  function track(event, onMove) {
+  function track(event, onMove, onEnd) {
     event.preventDefault();
     document.body.classList.add("is-dragging");
 
@@ -478,6 +611,7 @@
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
       window.removeEventListener("pointercancel", stop);
+      if (onEnd) onEnd();
     }
 
     window.addEventListener("pointermove", move);

@@ -12,7 +12,7 @@
        Le README.md reste visible sur la page du repository GitHub. -->
   <!-- "?v=1" : numéro de version, à augmenter quand tu modifies style.css
        pour forcer les navigateurs à recharger la nouvelle version. -->
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=14">
 </head>
 <body>
 
@@ -72,11 +72,20 @@
       <span class="folder-name">web&#8209;entities.exe</span><!-- &#8209; = tiret insécable, pour que le nom ne soit pas coupé -->
     </a>
 
+    <!-- Lecteur MP3 (playlist SoundCloud KeyGen Muzik).
+         data-width / data-height : taille du contenu de la fenêtre à
+         l'ouverture (sans la barre de titre), pour qu'elle soit pile à
+         la taille du lecteur. -->
+    <a class="folder" href="mp3-player/" data-window="KeyGen Muzik" data-width="550" data-height="232">
+      <img class="folder-icon app-icon" src="img/mp3-icon-10.png" alt="" aria-hidden="true">
+      <span class="folder-name">mp3&#8209;player.exe</span>
+    </a>
+
   </main>
 
   <!-- Gère l'ouverture des dossiers en fenêtres (déplacer, redimensionner,
        agrandir, plein écran, réduire, fermer). -->
-  <script src="js/desktop.js?v=3"></script>
+  <script src="js/desktop.js?v=4"></script>
 
   <!-- Écran de démarrage + son -->
   <script src="js/boot.js?v=6"></script>

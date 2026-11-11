@@ -110,6 +110,33 @@ body {
   transform: scale(0.96);
 }
 
+/* Icônes déplaçables (voir js/desktop.js) : une fois la page chargée,
+   chaque icône est placée librement sur le bureau. */
+.desktop {
+  position: relative;
+}
+
+.desktop.is-free .folder {
+  position: absolute;
+  touch-action: none;      /* glisser au doigt sans faire défiler */
+  -webkit-user-drag: none;
+}
+
+.folder img {
+  -webkit-user-drag: none;
+}
+
+/* Icône en train d'être déplacée : au-dessus des autres, légèrement
+   transparente, sans l'effet "enfoncé" */
+.folder.is-moving {
+  z-index: 5;
+  opacity: 0.8;
+}
+
+.folder.is-moving .folder-icon {
+  transform: none;
+}
+
 
 /* =========================================================
    FENÊTRES — style macOS sobre

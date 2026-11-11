@@ -39,13 +39,38 @@
 
 
   /* ---------------------------------------------------------
-     Ouvrir (ou ramener devant) une fenêtre
+     Demande venant d'une fenêtre : ouvrir une image en grand
+     (envoyée par process/notes.js quand on clique sur une image)
      --------------------------------------------------------- */
-  function openWindow(url, title) {
+  window.addEventListener("message", function (event) {
+    const data = event.data;
+    if (!data || data.type !== "open-image" || typeof data.url !== "string") return;
+
+    // On n'accepte que les messages venant de nos propres fenêtres
+    const fromOurWindow = Array.from(windows.values()).some(function (win) {
+      const frame = win.querySelector("iframe");
+      return frame && frame.contentWindow === event.source;
+    });
+    if (!fromOurWindow) return;
+
+    openWindow(data.url, data.title || "Image", {
+      image: true,
+      width: data.width,
+      height: data.height
+    });
+  });
+
+
+  /* ---------------------------------------------------------
+     Ouvrir (ou ramener devant) une fenêtre
+     options.image : true pour une fenêtre "aperçu d'image"
+     options.width / options.height : taille réelle de l'image
+     --------------------------------------------------------- */
+  function openWindow(url, title, options) {
     let win = windows.get(url);
 
     if (!win) {
-      win = createWindow(url, title);
+      win = createWindow(url, title, options || {});
       windows.set(url, win);
     }
 
@@ -57,9 +82,9 @@
   /* ---------------------------------------------------------
      Construire la fenêtre
      --------------------------------------------------------- */
-  function createWindow(url, title) {
+  function createWindow(url, title, options) {
     const win = document.createElement("section");
-    win.className = "window is-opening";
+    win.className = "window is-opening" + (options.image ? " window--image" : "");
     win.setAttribute("role", "dialog");
     win.setAttribute("aria-label", title);
 
@@ -80,7 +105,9 @@
           '</a>' +
         '</div>' +
       '</header>' +
-      '<iframe class="window-content" allow="autoplay; fullscreen"></iframe>' +
+      (options.image
+        ? '<div class="window-content window-image"><img alt=""></div>'
+        : '<iframe class="window-content" allow="autoplay; fullscreen"></iframe>') +
       '<div class="resize resize-n" data-dir="n"></div>' +
       '<div class="resize resize-s" data-dir="s"></div>' +
       '<div class="resize resize-e" data-dir="e"></div>' +
@@ -92,11 +119,30 @@
 
     win.querySelector(".window-title").textContent = title;
     win.querySelector(".tool-newtab").href = url;
-    win.querySelector(".window-content").src = url;
+    // Taille de départ : 80 % de l'écran au maximum
+    let w = Math.min(1100, Math.round(window.innerWidth * 0.8));
+    let h = Math.min(760, Math.round(window.innerHeight * 0.8));
 
-    // Taille et position de départ : 80 % de l'écran, centrée
-    const w = Math.min(1100, Math.round(window.innerWidth * 0.8));
-    const h = Math.min(760, Math.round(window.innerHeight * 0.8));
+    if (options.image) {
+      const img = win.querySelector(".window-image img");
+      img.src = url;
+      img.alt = title;
+
+      // La fenêtre prend les proportions de l'image (sans la
+      // dépasser en taille réelle), barre de titre comprise.
+      if (options.width > 0 && options.height > 0) {
+        const BAR = 36;
+        const maxW = Math.round(window.innerWidth * 0.85);
+        const maxH = Math.round(window.innerHeight * 0.85) - BAR;
+        const scale = Math.min(1, maxW / options.width, maxH / options.height);
+        w = Math.max(320, Math.round(options.width * scale));
+        h = Math.max(200, Math.round(options.height * scale) + BAR);
+      }
+    } else {
+      win.querySelector(".window-content").src = url;
+    }
+
+    // Position de départ : centrée
     win.style.width = w + "px";
     win.style.height = h + "px";
     win.style.left = Math.max(0, Math.round((window.innerWidth - w) / 2) + cascade) + "px";

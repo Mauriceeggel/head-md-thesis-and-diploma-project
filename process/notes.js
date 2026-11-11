@@ -58,6 +58,32 @@
     document.querySelector(".notes-content").scrollTop = 0;
   }
 
+  // --- Clic sur une image : l'ouvrir en grand ---
+  // Quand le bloc-notes est affiché dans une fenêtre du bureau (iframe),
+  // on demande au bureau (js/desktop.js) d'ouvrir l'image dans une
+  // nouvelle fenêtre. Si la page est ouverte seule, l'image s'ouvre
+  // dans un nouvel onglet.
+  notes.forEach(function (note) {
+    note.querySelectorAll("img").forEach(function (img) {
+      img.addEventListener("click", function () {
+        const url = img.currentSrc || img.src;
+        const name = decodeURIComponent(url.split("/").pop().split("?")[0]);
+
+        if (window.parent !== window) {
+          window.parent.postMessage({
+            type: "open-image",
+            url: url,
+            title: name,
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          }, "*");
+        } else {
+          window.open(url, "_blank", "noopener");
+        }
+      });
+    });
+  });
+
   // Au chargement : la note indiquée dans l'adresse, sinon la plus récente
   const fromHash = decodeURIComponent(location.hash.slice(1));
   const start = notes.some(function (n) { return n.id === fromHash; }) ? fromHash : notes[0].id;

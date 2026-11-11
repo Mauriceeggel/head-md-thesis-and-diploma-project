@@ -106,7 +106,14 @@
         '</div>' +
       '</header>' +
       (options.image
-        ? '<div class="window-content window-image"><img alt=""></div>'
+        ? '<div class="window-content window-image"><img alt="" draggable="false"></div>' +
+          // Zoom de l'image, en bas à droite (voir setupImageZoom)
+          '<div class="image-zoom">' +
+            '<button class="image-zoom-step" type="button" data-step="-1" aria-label="Dézoomer">−</button>' +
+            '<input class="image-zoom-slider" type="range" min="100" max="400" step="1" value="100" aria-label="Zoom">' +
+            '<button class="image-zoom-step" type="button" data-step="1" aria-label="Zoomer">+</button>' +
+            '<button class="image-zoom-value" type="button" title="Revenir à 100 %">100 %</button>' +
+          '</div>'
         : '<iframe class="window-content" allow="autoplay; fullscreen"></iframe>') +
       '<div class="resize resize-n" data-dir="n"></div>' +
       '<div class="resize resize-s" data-dir="s"></div>' +
@@ -221,7 +228,132 @@
       });
     });
 
+    if (options.image) setupImageZoom(win);
+
     return win;
+  }
+
+
+  /* ---------------------------------------------------------
+     Zoom dans une fenêtre d'image
+     - slider en bas à droite (100 % = image entière dans la fenêtre)
+     - boutons − / + et clic sur le pourcentage pour revenir à 100 %
+     - pincer sur le trackpad (ou Ctrl + molette) pour zoomer
+     - double-clic sur l'image : zoom ×2 / retour à 100 %
+     - image zoomée : glisser pour se déplacer dedans
+     --------------------------------------------------------- */
+  function setupImageZoom(win) {
+    const MIN = 1;
+    const MAX = 4;
+    const STEP = 0.25; // pas des boutons − / +
+
+    const view = win.querySelector(".window-image");
+    const img = view.querySelector("img");
+    const slider = win.querySelector(".image-zoom-slider");
+    const value = win.querySelector(".image-zoom-value");
+
+    let zoom = 1;
+
+    // Taille de l'image quand elle tient entière dans la fenêtre
+    function fitSize() {
+      const nw = img.naturalWidth;
+      const nh = img.naturalHeight;
+      if (!nw || !nh || !view.clientWidth || !view.clientHeight) return null;
+      const scale = Math.min(view.clientWidth / nw, view.clientHeight / nh);
+      return { width: nw * scale, height: nh * scale };
+    }
+
+    // Change le zoom en gardant immobile le point (x, y) de la fenêtre
+    // (par défaut le centre) : on zoome "vers" ce point.
+    function setZoom(newZoom, x, y) {
+      const fit = fitSize();
+      if (!fit) return;
+
+      newZoom = Math.min(MAX, Math.max(MIN, newZoom));
+      const box = view.getBoundingClientRect();
+      if (x === undefined) x = box.width / 2;
+      if (y === undefined) y = box.height / 2;
+
+      // Où se trouve ce point sur l'image, en proportion (0 → 1)
+      const before = img.getBoundingClientRect();
+      const ratioX = clamp01((box.left + x - before.left) / before.width);
+      const ratioY = clamp01((box.top + y - before.top) / before.height);
+
+      zoom = newZoom;
+      img.style.width = fit.width * zoom + "px";
+      img.style.height = fit.height * zoom + "px";
+      view.classList.toggle("is-zoomed", zoom > 1);
+
+      // On fait défiler pour ramener ce point sous la souris / au centre
+      const after = img.getBoundingClientRect();
+      view.scrollLeft += after.left + ratioX * after.width - (box.left + x);
+      view.scrollTop += after.top + ratioY * after.height - (box.top + y);
+
+      const percent = Math.round(zoom * 100);
+      slider.value = percent;
+      value.textContent = percent + " %";
+      // Partie remplie du slider (voir --fill dans style.css)
+      slider.style.setProperty("--fill", ((zoom - MIN) / (MAX - MIN)) * 100 + "%");
+    }
+
+    function clamp01(n) {
+      return isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.5;
+    }
+
+    // Taille correcte dès que l'image est chargée, puis à chaque
+    // redimensionnement de la fenêtre (agrandir, plein écran…)
+    if (img.complete) setZoom(zoom);
+    img.addEventListener("load", function () { setZoom(zoom); });
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () { setZoom(zoom); }).observe(view);
+    }
+
+    // --- Commandes en bas à droite ---
+    slider.addEventListener("input", function () {
+      setZoom(slider.value / 100);
+    });
+
+    win.querySelectorAll(".image-zoom-step").forEach(function (button) {
+      button.addEventListener("click", function () {
+        setZoom(zoom + Number(button.dataset.step) * STEP);
+      });
+    });
+
+    value.addEventListener("click", function () {
+      setZoom(1);
+    });
+
+    // --- Pincer (trackpad) / Ctrl + molette ---
+    view.addEventListener("wheel", function (event) {
+      if (!event.ctrlKey) return; // molette seule : défilement normal
+      event.preventDefault();
+      const box = view.getBoundingClientRect();
+      setZoom(zoom * Math.exp(-event.deltaY * 0.01), event.clientX - box.left, event.clientY - box.top);
+    }, { passive: false });
+
+    // --- Double-clic : zoom ×2 à l'endroit cliqué / retour à 100 % ---
+    img.addEventListener("dblclick", function (event) {
+      const box = view.getBoundingClientRect();
+      setZoom(zoom > 1 ? 1 : 2, event.clientX - box.left, event.clientY - box.top);
+    });
+
+    // --- Glisser pour se déplacer dans l'image zoomée ---
+    view.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0 || zoom <= 1) return;
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startLeft = view.scrollLeft;
+      const startTop = view.scrollTop;
+
+      view.classList.add("is-panning");
+      track(event, function (e) {
+        view.scrollLeft = startLeft - (e.clientX - startX);
+        view.scrollTop = startTop - (e.clientY - startY);
+      });
+      window.addEventListener("pointerup", function () {
+        view.classList.remove("is-panning");
+      }, { once: true });
+    });
   }
 
 

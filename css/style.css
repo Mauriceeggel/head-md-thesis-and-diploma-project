@@ -287,26 +287,147 @@ body {
 }
 
 /* Fenêtre "aperçu d'image" (image cliquée dans le bloc-notes) :
-   l'image remplit la fenêtre sans être déformée ni recadrée. */
+   l'image remplit la fenêtre sans être déformée ni recadrée.
+   Sa taille exacte (et le zoom) est calculée par js/desktop.js. */
 .window-image {
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 0;
   background: #1e1e1e;
   overflow: hidden;
 }
 
+/* Image zoomée : on peut se déplacer dedans (barres de défilement
+   cachées, on glisse avec la souris) */
+.window-image.is-zoomed {
+  overflow: auto;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
+.window-image.is-zoomed::-webkit-scrollbar {
+  display: none;
+}
+
+.window-image.is-panning {
+  cursor: grabbing;
+}
+
 .window-image img {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  flex: none;
+  margin: auto;          /* centrée tant qu'elle est plus petite que la fenêtre */
   width: 100%;
   height: 100%;
   object-fit: contain;
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
+}
+
+/* ---------------------------------------------------------
+   Zoom de l'image : petite barre en bas à droite
+   −  [slider]  +  100 %
+   --------------------------------------------------------- */
+.image-zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;            /* au-dessus des poignées de redimensionnement */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(40, 40, 40, 0.72);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.image-zoom-step,
+.image-zoom-value {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: var(--cursor);
+}
+
+.image-zoom-step {
+  width: 16px;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.image-zoom-step:hover {
+  opacity: 1;
+}
+
+.image-zoom-value {
+  min-width: 42px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  opacity: 0.8;
+}
+
+.image-zoom-value:hover {
+  opacity: 1;
+}
+
+/* Le slider : fine ligne, partie remplie en blanc, curseur rond */
+.image-zoom-slider {
+  --fill: 0%;
+  width: 110px;
+  height: 14px;
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: var(--cursor);
+}
+
+.image-zoom-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #ffffff var(--fill), rgba(255, 255, 255, 0.3) var(--fill));
+}
+
+.image-zoom-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.image-zoom-slider::-moz-range-track {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.image-zoom-slider::-moz-range-progress {
+  height: 3px;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.image-zoom-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Pendant un déplacement ou un redimensionnement, l'iframe ne doit

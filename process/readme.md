@@ -37,11 +37,11 @@ Each entry is dated and arranged in reverse chronological order.
 
 ## Map your subject
 
-
+[MAP](https://www.figma.com/board/GGSjUsKEXbrpD3xKfX7BkW/Designing-Question?node-id=0-1&t=OnYCyFtBoEU2Vg0N-1)
 
 ## Angle of approach
 
-
+I am not entirely sure about my approach at this stage. I would like to develop a scientific and theoretical investigation into my subject, while remaining equally interested in exploring its poetic dimension. Perhaps there is a way to bring these two approaches together?
 
 # State of the art
 

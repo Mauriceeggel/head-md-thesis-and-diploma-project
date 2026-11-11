@@ -37,7 +37,9 @@ Each entry is dated and arranged in reverse chronological order.
 
 ## Map your subject
 
-[MAP](https://www.figma.com/board/GGSjUsKEXbrpD3xKfX7BkW/Designing-Question?node-id=0-1&t=OnYCyFtBoEU2Vg0N-1)
+(subject to change ➔ see [Figjam](https://www.figma.com/board/GGSjUsKEXbrpD3xKfX7BkW/Designing-Question?node-id=0-1&t=OnYCyFtBoEU2Vg0N-1) )
+
+![mapv01](img/mapv01.png)
 
 ## Angle of approach
 

@@ -172,7 +172,8 @@ body {
   margin: 0 0 12px;
 }
 
-.note ul {
+.note ul,
+.note ol {
   margin: 0 0 12px;
   padding-left: 22px;
 }

@@ -4,6 +4,45 @@
 Each entry is dated and arranged in reverse chronological order. 
 <hr>
 
+# 𖨠 26.11.25  𖨠 <br> 
+
+### [Figma](https://www.figma.com/board/GGSjUsKEXbrpD3xKfX7BkW/Designing-Question?node-id=0-1&t=k26EDJP99MAbkiDU-1) 
+
+<u>**Mind map – Sound & The Digital**</u>
+
+Sound is often treated as secondary in digital spaces, yet it is what gives them presence, substance and meaning. That is what interests me. I approach it as a musician and sound designer: to me, sound is a material I shape.
+
+My research follows three paths:
+
+1. Sound as narrative. Image and sound transform each other and give rise to a narrative. Digital media can push this further by adding interaction.
+
+2. Sound as interaction. In video games, sound does more than accompany: it informs, guides, threatens and becomes a mechanic. A Blind Legend is played by ear alone. In Alien: Isolation, listening is a matter of survival. Inside has no on-screen interface: sound carries both immersion and information.
+
+3. [the option I favor the least] The physicality of digital sound. I am drawn to sounds that are entirely constructed yet feel real, as if they came from an actual instrument or physical space. I like blurring the line between acoustic and synthetic.
+
+Video games seem to me the ground that connects these three paths: a digital space that tells stories, and where sound has an almost physical function.
+
+
+# Assignment
+
+- 3 important references 
+
+  1. [iglooghost](https://iglooghost.net/)
+  2. [Valve's Approach to an Open and Flexible Audio Engine](https://www.youtube.com/watch?v=QrzeBF5hgMs)
+  3. [Karen Collins, Game Sound](https://direct.mit.edu/books/monograph/2460/Game-SoundAn-Introduction-to-the-History-Theory)
+
+- Design question attempts:
+
+  - How can sound, more than image, shape perception, presence and action in an interactive digital space?
+
+  - How does sound contribute to the user's perception, influence their actions, and interactions with a virtual environment ?
+
+  - How does sound transform our interactions with the digital world ?
+
+
+
+<hr>
+
 # 𖨠 26.11.04 -  André Ourednik 𖨠 <br> 
 
 [<u>**Alterated Realities and Real Alternatives**</u>](https://ourednik.info/events.php?event=head2026-art-emotions-ai-1)

@@ -20,8 +20,17 @@ My research follows three paths:
 
 3. [the option I favor the least] The physicality of digital sound. I am drawn to sounds that are entirely constructed yet feel real, as if they came from an actual instrument or physical space. I like blurring the line between acoustic and synthetic.
 
-Video games seem to me the ground that connects these three paths: a digital space that tells stories, and where sound has an almost physical function.
+Video games are a medium I have explored for a long time and still love discovering. I see them as a middle ground for exploring the relationship between sound and the digital, through interactivity: <br>
 
+**how does sound contribute to the gaming experience, and how does it shape the player's perception, actions and interactions with the virtual environment?**
+
+Several games have stayed with me because of their sound:
+
+- Alien: Isolation: listening is a matter of survival. Every noise is both information and danger.
+- Inside: with no on-screen interface, sound carries the immersion, guides attention and becomes a mechanic.
+- Nintendo games: their music and sound design shape their identity and stay with players long after they stop playing.
+
+**What interests me is sound as information, as mechanic and as memory.**
 
 # Assignment
 
@@ -29,7 +38,8 @@ Video games seem to me the ground that connects these three paths: a digital spa
 
   1. [iglooghost](https://iglooghost.net/)
   2. [Valve's Approach to an Open and Flexible Audio Engine](https://www.youtube.com/watch?v=QrzeBF5hgMs)
-  3. [Karen Collins, Game Sound](https://direct.mit.edu/books/monograph/2460/Game-SoundAn-Introduction-to-the-History-Theory)
+  3. [Karen Collins, Game Sound](https://direct.mit.edu/books/monograph/2460/Game-SoundAn-Introduction-to-the-History-Theory)<br>
+  [Karen Collins, Sonic UX](https://mitpress.mit.edu/9780262053730/sonic-ux/)
 
 - Design question attempts:
 
